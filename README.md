@@ -1,4 +1,4 @@
-# azure-edge-extensions-aio-iac-terraform
+# Azure Edge Extensions AIO IaC Terraform
 
 Infrastructure as Code (IaC) Terraform to install all Azure IoT Operations (AIO) components. Provides an optional infrastructure deployment that configures a Kubernetes cluster connected to Azure Arc. Each AIO component deployment is split out into separate Terraform deployment directories to make deploying a particular component (or all) of AIO easy, quick, and straightforward.
 
