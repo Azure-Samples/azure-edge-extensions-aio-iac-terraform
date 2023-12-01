@@ -32,3 +32,16 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+# Ignore .terraform folders and .terraform.lock.hcl
+.terraform
+.terraform.*
+
+# Ignore file system and IDE specific files
+*.idea
+*.DotSettings.*
+.DS_Store
+*.vscode
+
+# Ignore out directory used by IaC
+**/out/*
