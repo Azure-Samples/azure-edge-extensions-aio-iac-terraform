@@ -1,0 +1,8 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: ${aio_mq_broker_frontend_server_name}
+  namespace: ${aio_cluster_namespace}
+spec:
+  ca:
+    secretName: secret-tls
