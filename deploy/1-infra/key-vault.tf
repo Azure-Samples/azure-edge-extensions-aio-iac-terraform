@@ -18,7 +18,7 @@ resource "azurerm_key_vault" "aio_kv" {
 
 resource "azurerm_key_vault_access_policy" "aio_kv_admin_user" {
   key_vault_id = azurerm_key_vault.aio_kv.id
-  object_id    = local.admin_client_id
+  object_id    = local.admin_object_id
   tenant_id    = data.azurerm_client_config.current.tenant_id
 
   secret_permissions = ["Backup", "Delete", "Get", "List", "Purge", "Recover", "Restore", "Set"]
@@ -32,7 +32,7 @@ resource "azurerm_key_vault_access_policy" "aio_kv_admin_user" {
 // If admin client id was provided, then give current client id access to create secret for placeholder-secret
 
 resource "azurerm_key_vault_access_policy" "aio_kv_current_user" {
-  count        = var.admin_client_id != null ? 1 : 0
+  count        = var.admin_object_id != null ? 1 : 0
   key_vault_id = azurerm_key_vault.aio_kv.id
   object_id    = data.azurerm_client_config.current.object_id
   tenant_id    = data.azurerm_client_config.current.tenant_id
@@ -57,7 +57,7 @@ resource "azurerm_key_vault_secret" "aio_placeholder" {
 
 resource "azurerm_key_vault_access_policy" "aio_sp" {
   key_vault_id = azurerm_key_vault.aio_kv.id
-  object_id    = local.aio_sp_client_id
+  object_id    = local.aio_sp_object_id
   tenant_id    = data.azurerm_client_config.current.tenant_id
 
   secret_permissions      = ["Get", "List"]

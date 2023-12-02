@@ -26,7 +26,7 @@ data "azuread_service_principal" "custom_locations_rp" {
 resource "azuread_application" "aio_onboard_sp" {
   count        = var.should_create_aio_onboard_sp ? 1 : 0
   display_name = "sp-${var.name}-onboard"
-  owners       = [local.admin_client_id]
+  owners       = [local.admin_object_id]
 }
 
 resource "azuread_application_password" "aio_onboard_sp" {
@@ -40,7 +40,7 @@ resource "azuread_service_principal" "aio_onboard_sp" {
   count           = var.should_create_aio_onboard_sp ? 1 : 0
   client_id       = azuread_application.aio_onboard_sp[0].client_id
   account_enabled = true
-  owners          = [local.admin_client_id]
+  owners          = [local.admin_object_id]
 }
 
 // AIO Service Principal which will have access to Key Vault
@@ -48,7 +48,7 @@ resource "azuread_service_principal" "aio_onboard_sp" {
 resource "azuread_application" "aio_sp" {
   count        = var.should_create_aio_akv_sp ? 1 : 0
   display_name = "sp-${var.name}-aio"
-  owners       = [local.admin_client_id]
+  owners       = [local.admin_object_id]
 
   required_resource_access {
     resource_app_id = data.azuread_service_principal.akv.client_id
@@ -71,5 +71,5 @@ resource "azuread_service_principal" "aio_sp" {
   count           = var.should_create_aio_akv_sp ? 1 : 0
   client_id       = azuread_application.aio_sp[0].client_id
   account_enabled = true
-  owners          = [local.admin_client_id]
+  owners          = [local.admin_object_id]
 }

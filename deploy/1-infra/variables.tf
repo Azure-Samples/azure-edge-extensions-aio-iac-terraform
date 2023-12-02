@@ -56,7 +56,7 @@ variable "should_create_aio_akv_sp" {
   default     = true
 }
 
-variable "admin_client_id" {
+variable "admin_object_id" {
   description = "The Client ID that will have admin privileges to the new Kubernetes cluster and Azure Key Vault. (Optional, use current logged in user)"
   type        = string
   default     = null
@@ -73,6 +73,12 @@ variable "aio_onboard_sp_client_secret" {
   type        = string
   default     = null
   sensitive   = true
+}
+
+variable "aio_akv_sp_object_id" {
+  description = "The Service Principal Object ID for AIO to use with Azure Key Vault. (Optional, creates new one)"
+  type        = string
+  default     = null
 }
 
 variable "aio_akv_sp_client_id" {

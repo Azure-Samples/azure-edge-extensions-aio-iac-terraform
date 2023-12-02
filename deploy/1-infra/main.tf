@@ -9,10 +9,11 @@ locals {
   arc_resource_name = "arc-${var.name}"
   arc_cluster_id    = "${azurerm_resource_group.this.id}/providers/Microsoft.Kubernetes/connectedClusters/${local.arc_resource_name}"
 
-  admin_client_id = var.admin_client_id == null ? data.azurerm_client_config.current.object_id : var.admin_client_id
+  admin_object_id = var.admin_object_id == null ? data.azurerm_client_config.current.object_id : var.admin_object_id
 
   aio_onboard_sp_client_id     = var.should_create_aio_onboard_sp ? azuread_service_principal.aio_onboard_sp[0].client_id : var.aio_onboard_sp_client_id
   aio_onboard_sp_client_secret = var.should_create_aio_onboard_sp ? azuread_application_password.aio_onboard_sp[0].value : var.aio_onboard_sp_client_secret
+  aio_sp_object_id             = var.should_create_aio_akv_sp ? azuread_service_principal.aio_sp[0].object_id : var.aio_akv_sp_client_id
   aio_sp_client_id             = var.should_create_aio_akv_sp ? azuread_service_principal.aio_sp[0].client_id : var.aio_akv_sp_client_id
   aio_sp_client_secret         = var.should_create_aio_akv_sp ? azuread_application_password.aio_sp[0].value : var.aio_akv_sp_client_secret
 }
@@ -138,7 +139,7 @@ locals {
     tenant_id         = data.azurerm_client_config.current.tenant_id
     subscription_id   = data.azurerm_client_config.current.subscription_id
     location          = var.location
-    cluster_admin_oid = local.admin_client_id
+    cluster_admin_oid = local.admin_object_id
 
     resource_group_name = azurerm_resource_group.this.name
 
