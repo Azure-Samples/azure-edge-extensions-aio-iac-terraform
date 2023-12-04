@@ -3,7 +3,7 @@ variable "name" {
   type        = string
   nullable    = false
   validation {
-    condition     = var.name != "sample-aio" && length(var.name) < 14
+    condition     = var.name != "sample-aio" && length(var.name) < 15
     error_message = "Please update 'name' to a short, unique name."
   }
 }
@@ -11,6 +11,31 @@ variable "name" {
 variable "location" {
   type    = string
   default = "westus3"
+}
+
+variable "aio_cluster_namespace" {
+  description = "The namespace in the cluster where AIO resources will be deployed."
+  type        = string
+  default     = "aio"
+}
+
+variable "aio_placeholder_secret_value" {
+  description = "The value for the placeholder secret that will be used by AIO (can be anything)."
+  type        = string
+  nullable    = false
+}
+
+variable "resource_group_name" {
+  description = "(Optional) The name of the Resource Group where all resources will be created. (If left blank, will use rg-<var.name>)"
+  type        = string
+  default     = null
+  nullable    = true
+}
+
+variable "should_create_resource_group" {
+  description = "Create and manage the Resource Group or use an existing Resource Group."
+  type        = bool
+  default     = true
 }
 
 variable "should_use_linux" {
@@ -61,64 +86,60 @@ variable "should_create_aio_akv_sp" {
 }
 
 variable "admin_object_id" {
-  description = "The Client ID that will have admin privileges to the new Kubernetes cluster and Azure Key Vault. (Optional, use current logged in user)"
+  description = "(Optional) The Client ID that will have admin privileges to the new Kubernetes cluster and Azure Key Vault. (Otherwise, uses current logged in user)"
   type        = string
   default     = null
+  nullable    = true
 }
 
 variable "aio_onboard_sp_client_id" {
-  description = "The Service Principal Client ID for onboarding the cluster to Arc. (Optional, creates new one)"
+  description = "(Optional) The Service Principal Client ID for onboarding the cluster to Arc. (Otherwise, creates new one)"
   type        = string
   default     = null
+  nullable    = true
 }
 
 variable "aio_onboard_sp_client_secret" {
-  description = "The Service Principal Client Secret for onboarding the cluster to Arc. (Optional, create new one)"
+  description = "(Optional) The Service Principal Client Secret for onboarding the cluster to Arc. (Otherwise, creates new one)"
   type        = string
   default     = null
   sensitive   = true
+  nullable    = true
 }
 
 variable "aio_akv_sp_object_id" {
-  description = "The Service Principal Object ID for AIO to use with Azure Key Vault. (Optional, creates new one)"
+  description = "(Optional) The Service Principal Object ID for AIO to use with Azure Key Vault. (Otherwise, creates new one)"
   type        = string
   default     = null
+  nullable    = true
 }
 
 variable "aio_akv_sp_client_id" {
-  description = "The Service Principal Client ID for AIO to use with Azure Key Vault. (Optional, creates new one)"
+  description = "(Optional) The Service Principal Client ID for AIO to use with Azure Key Vault. (Otherwise, creates new one)"
   type        = string
   default     = null
+  nullable    = true
 }
 
 variable "aio_akv_sp_client_secret" {
-  description = "The Service Principal Client Secret for AIO to use with Azure Key Vault. (Optional, creates new one)"
+  description = "(Optional) The Service Principal Client Secret for AIO to use with Azure Key Vault. (Otherwise, creates new one)"
   type        = string
   default     = null
   sensitive   = true
-}
-
-variable "aio_cluster_namespace" {
-  description = "The namespace in the cluster where AIO resources will be deployed."
-  type        = string
-  default     = "aio"
+  nullable    = true
 }
 
 variable "aio_ca_secret_name" {
   description = "The name of the Kubernetes TLS secret that has the CA cert and key."
   type        = string
   default     = "secret-tls"
+  nullable    = false
 }
 
 variable "aio_akv_sp_secret_name" {
   description = "The name of the Secret that stores the Service Principal Client ID and Client Secret for the Azure Key Vault Secret Provider Extension."
   type        = string
   default     = "aio-secrets-store-creds"
-}
-
-variable "aio_placeholder_secret_value" {
-  description = "The value for the placeholder secret that will be used by AIO (can be anything)."
-  type        = string
   nullable    = false
 }
 
