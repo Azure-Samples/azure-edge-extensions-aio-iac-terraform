@@ -1,0 +1,20 @@
+# Source: microsoft.iotoperations.opcuabroker/templates/opcplc_configMap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opcplc-config
+data:
+  nodesfile.json: |-
+    {
+        "Folder": "MyTelemetry",
+        "NodeList": [
+            {
+                "NodeId": "panic",
+                "Name": "Panic",
+                "DataType": "Boolean",
+                "ValueRank": -1,
+                "AccessLevel": "CurrentReadOrWrite",
+                "Description": "Node that panics, if written"
+            }
+        ]
+    }

@@ -1,0 +1,20 @@
+dataPoints:
+  - dataSource: nsu=http://microsoft.com/Opc/OpcPlc/;s=FastUInt1
+    capabilityId: dtmi:com:example:Thermostat;1:temperature
+    observabilityMode: log
+    dataPointConfiguration: |-
+      {
+        "samplingInterval": 5000,
+        "queueSize": 15
+      }        
+  - dataSource: nsu=http://microsoft.com/Opc/OpcPlc/;s=FastUInt2
+    capabilityId: dtmi:com:example:Thermostat;1:pressure
+    observabilityMode: log
+    dataPointConfiguration: |-
+      {
+        "samplingInterval": 500,
+        "queueSize": 15
+      }        
+  - dataSource: nsu=http://microsoft.com/Opc/OpcPlc/Boiler;i=15013
+    capabilityId: dtmi:com:example:Thermostat;1:boilerStatus
+    observabilityMode: log

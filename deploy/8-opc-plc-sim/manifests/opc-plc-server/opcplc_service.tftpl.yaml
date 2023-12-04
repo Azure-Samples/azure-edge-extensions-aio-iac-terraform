@@ -1,0 +1,13 @@
+# Source: microsoft.iotoperations.opcuabroker/templates/opcplc_service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${opc_plc_sim_server_name}
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/instance: ${opc_plc_sim_server_name}
+  ports:
+    - port: 50000
+      protocol: TCP
+      targetPort: 50000

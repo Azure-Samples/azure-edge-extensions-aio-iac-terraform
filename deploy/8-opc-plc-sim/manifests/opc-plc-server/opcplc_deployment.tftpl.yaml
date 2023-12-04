@@ -1,0 +1,61 @@
+# Source: microsoft.iotoperations.opcuabroker/templates/opcplc_deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${opc_plc_sim_server_name}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: ${opc_plc_sim_server_name}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: opcplc
+        app.kubernetes.io/instance: ${opc_plc_sim_server_name}
+        app.kubernetes.io/version: ${opc_plc_sim_image_version}
+    spec:
+      nodeSelector:
+        "kubernetes.io/os": linux
+      containers:
+        - name: opcplc
+          image: mcr.microsoft.com/iotedge/opc-plc:${opc_plc_sim_image_version}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 50000
+          args:
+            - "--ph=${opc_plc_sim_server_name}.${aio_cluster_namespace}"
+            - "--cdn=${opc_plc_sim_server_name}.${aio_cluster_namespace},${opc_plc_sim_server_name}"
+            - "--nodesfile=/app/nodesfile.json"
+            - "--ut"
+            - "--autoaccept"
+            - "--sn=25"
+            - "--sr=10"
+            - "--fn=2000"
+            - "--vfr=1000"
+            - "--gn=5"
+            - "--pn=50000"
+            - "--maxsessioncount=100"
+            - "--maxsubscriptioncount=100"
+            - "--maxqueuedrequestcount=2000"
+            - "--ses"
+            - "--alm"
+          volumeMounts:
+            - name: ${opc_plc_sim_server_name}-config
+              mountPath: /app/nodesfile.json
+              subPath: nodesfile.json
+            - name: ${opc_plc_sim_server_name}-pki
+              mountPath: /app/pki/
+          resources:
+            limits:
+              cpu: 500m
+              memory: 768Mi
+            requests:
+              cpu: 125m
+              memory: 192Mi
+      volumes:
+        - name: ${opc_plc_sim_server_name}-config
+          configMap:
+            name: opcplc-config
+        - name: ${opc_plc_sim_server_name}-pki
+          emptyDir:
+            sizeLimit: 64Mi

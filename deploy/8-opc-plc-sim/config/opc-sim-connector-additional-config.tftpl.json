@@ -1,0 +1,17 @@
+{
+    "applicationName": "${opc_sim_connector_name}",
+    "defaults": {
+        "publishingIntervalMilliseconds": 1000,
+        "samplingIntervalMilliseconds": 500,
+        "queueSize": 1
+    },
+    "session": {
+        "timeout": 60000
+    },
+    "subscription": {
+        "maxItems": 1000
+    },
+    "security": {
+        "autoAcceptUntrustedServerCertificates": true
+    }
+}

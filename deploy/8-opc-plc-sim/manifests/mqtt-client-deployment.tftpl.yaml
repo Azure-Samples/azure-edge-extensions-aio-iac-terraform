@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mqtt-client
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: mqtt-client
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: mqtt-client
+    spec:
+      nodeSelector:
+        "kubernetes.io/os": linux
+      containers:
+        - name: mqtt-client
+          image: alpine
+          imagePullPolicy: Always
+          command:
+            - "sh"
+            - "-c"
+          args:
+            - "apk add mosquitto-clients mqttui && sleep infinity"
+          volumeMounts:
+            - name: mq-sat
+              mountPath: /var/run/secrets/tokens
+            - name: trust-bundle
+              mountPath: /var/run/certs
+      volumes:
+        - name: mq-sat
+          projected:
+            sources:
+              - serviceAccountToken:
+                  path: mq-sat
+                  audience: ${aio_mq_auth_sat_audience}
+                  expirationSeconds: 86400
+        - name: trust-bundle
+          configMap:
+            name: ${aio_ca_cm_name}

@@ -1,0 +1,15 @@
+apiVersion: akri.sh/v0
+kind: Configuration
+metadata:
+  name: akri-opcua-asset
+spec:
+  discoveryHandler:
+    name: opcua-asset
+    discoveryDetails: |
+      opcuaDiscoveryMethod:
+        - asset:
+            endpointUrl: "${opcua_sim_endpoint_url}"
+            useSecurity: false
+            autoAcceptUntrustedCertificates: true
+  brokerProperties: {}
+  capacity: 1
