@@ -3,7 +3,7 @@ variable "name" {
   type        = string
   nullable    = false
   validation {
-    condition     = var.name != "aio-smpl" && length(var.name) < 14
+    condition     = var.name != "sample-aio" && length(var.name) < 14
     error_message = "Please update 'name' to a short, unique name."
   }
 }
