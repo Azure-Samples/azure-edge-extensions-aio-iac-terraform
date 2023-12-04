@@ -2,6 +2,10 @@ variable "name" {
   description = "The unique primary name used when naming resources. (ex. 'test' makes 'rg-test' resource group)"
   type        = string
   nullable    = false
+  validation {
+    condition     = var.name != "aio-smpl" && length(var.name) < 14
+    error_message = "Please update 'name' to a short, unique name."
+  }
 }
 
 variable "location" {
