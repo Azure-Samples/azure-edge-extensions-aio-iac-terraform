@@ -85,6 +85,31 @@ variable "should_create_aio_akv_sp" {
   default     = true
 }
 
+variable "vm_computer_name" {
+  description = "The Computer Name for the VM."
+  type        = string
+  nullable    = false
+}
+
+variable "vm_username" {
+  description = "The Username used to login to the VM."
+  type        = string
+  nullable    = false
+}
+
+variable "vm_ssh_pub_key_file" {
+  description = "(Required for Linux VMs) The file path to the SSH public key."
+  type        = string
+  default     = null
+}
+
+variable "vm_password" {
+  description = "(Required for Windows VMs) The Password used to login to the VM."
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
 variable "admin_object_id" {
   description = "(Optional) The Client ID that will have admin privileges to the new Kubernetes cluster and Azure Key Vault. (Otherwise, uses current logged in user)"
   type        = string
@@ -130,58 +155,33 @@ variable "aio_akv_sp_client_secret" {
 }
 
 variable "aio_ca_secret_name" {
-  description = "The name of the Kubernetes TLS secret that has the CA cert and key."
+  description = "(Optional) The name of the Kubernetes TLS secret that has the CA cert and key. (Otherwise, 'secret-tls')"
   type        = string
   default     = "secret-tls"
   nullable    = false
 }
 
 variable "aio_akv_sp_secret_name" {
-  description = "The name of the Secret that stores the Service Principal Client ID and Client Secret for the Azure Key Vault Secret Provider Extension."
+  description = "(Optional) The name of the Secret that stores the Service Principal Client ID and Client Secret for the Azure Key Vault Secret Provider Extension. (Otherwise, 'aio-secrets-store-creds')"
   type        = string
   default     = "aio-secrets-store-creds"
   nullable    = false
 }
 
-variable "vm_ssh_pub_key_file" {
-  description = "The file path to the SSH public key. (Only for Linux VMs)"
-  type        = string
-  nullable    = false
-}
-
-variable "vm_computer_name" {
-  description = "The Computer Name for the VM."
-  type        = string
-  nullable    = false
-}
-
-variable "vm_username" {
-  description = "The Username used to login to the VM."
-  type        = string
-  nullable    = false
-}
-
-variable "vm_password" {
-  description = "The Password used to login to the VM. (Only for Windows VMs)"
-  type        = string
-  default     = ""
-  sensitive   = true
-}
-
 variable "vnet_address_space" {
-  description = "The VNET address space for the VM."
+  description = "(Optional) The VNET address space for the VM. (Otherwise, '10.0.0.0/16')"
   type        = string
   default     = "10.0.0.0/16"
 }
 
 variable "subnet_address_space" {
-  description = "The subnet address in the VNET for the VM."
+  description = "(Optional) The subnet address in the VNET for the VM. (Otherwise, '10.0.2.0/24')"
   type        = string
   default     = "10.0.2.0/24"
 }
 
 variable "current_wan_ip" {
-  description = "Current WAN IP address to allow list, if left blank then current IP will be determined."
+  description = "(Optional) Current WAN IP address to allow list, if left blank then current WAN IP will be used. (Only needed when adding NSG security rules)"
   type        = string
   default     = null
 }

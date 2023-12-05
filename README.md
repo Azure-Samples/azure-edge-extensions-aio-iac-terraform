@@ -44,11 +44,15 @@ This project utilizes Terraform to do the following:
     vm_ssh_pub_key_file          = "~/.ssh/<generated-public-ssh-key>.pub"
     aio_placeholder_secret_value = "<placeholder-secret-value"
     ```
-5. From the [deploy/1-infra](deploy/1-infra) directory apply the terraform (the `<name>.auto.tfvars` will automatically be applied, you will still need to reference the `<name>.tfvars` file directly):
+5. From the [deploy/1-infra](deploy/1-infra) directory execute `terraform init` to pull down the latest Terraform providers.
+   ```shell
+   terraform init
+   ```
+6. From the [deploy/1-infra](deploy/1-infra) directory apply the terraform (the `<name>.auto.tfvars` will automatically be applied, you will still need to reference the `<name>.tfvars` file directly):
     ```shell
     terraform apply -var-file="../<name>.tfvars"
     ```
-6. Repeat the same process for each of the additional *deploy/* directories, as an example, navigate to [deploy/2-aio-orchestrator](deploy/2-aio-orchestrator) and execute:
+7. Repeat the same process for each of the additional *deploy/* directories, as an example, navigate to [deploy/2-aio-orchestrator](deploy/2-aio-orchestrator) and execute:
     ```shell
     terraform apply -var-file="../<name>.tfvars"
     ```
