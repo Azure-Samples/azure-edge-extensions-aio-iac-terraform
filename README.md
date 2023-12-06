@@ -31,28 +31,42 @@ This project utilizes Terraform to do the following:
     ```shell
     ssh-keygen -t rsa -b 4096 -C "<computer-username>"
     ```
-2. Login to the AZ CLI, `az login --tenant <tenant>.onmicrosoft.com`.
-3. Add a <name>.tfvars to the [deploy](deploy) directory that contains the following (replace `<unique-name>` and `<location>` with a name used by the resources and a location of where to deploy the resources):
+2. Login to the AZ CLI:
+    ```shell
+      az login --tenant <tenant>.onmicrosoft.com
+    ```
+   - Make sure your subscription is the one that you would like to use: `az account show`.
+   - Change to the subscription that you would like to use if needed:
+     ```shell
+     az account set -s <subscription-id>
+     ```
+3. Add a `root-<unique-name>.tfvars` file to the root of the [deploy](deploy) directory that contains the following (refer to [deploy/sample-aio.general.tfvars.example](deploy/sample-aio.general.tfvars.example) for an example):
     ```hcl
+    // <project-root>/deploy/root-<unique-name>.tfvars
+
     name = "<unique-name>"
     location = "<location>"
     ```
-4. Add a <name>.auto.tfvars to the [deploy](deploy/1-infra) directory that contains the following required variables (replace the values with your own values):
+4. Add a `<unique-name>.auto.tfvars` to the [deploy/1-infra](deploy/1-infra) directory that contains the following required variables (refer to the [deploy/sample-aio.auto.tfvars.example](deploy/1-infra/sample-aio.auto.tfvars.example) for an example):
     ```hcl
+    // <project-root>/deploy/1-infra/<unique-name>.auto.tfvars
+
     vm_computer_name             = "<computer-name>"
     vm_username                  = "<computer-username>"
     vm_ssh_pub_key_file          = "~/.ssh/<generated-public-ssh-key>.pub"
     aio_placeholder_secret_value = "<placeholder-secret-value"
     ```
-5. From the [deploy/1-infra](deploy/1-infra) directory execute `terraform init` to pull down the latest Terraform providers.
-   ```shell
-   terraform init
-   ```
-6. From the [deploy/1-infra](deploy/1-infra) directory apply the terraform (the `<name>.auto.tfvars` will automatically be applied, you will still need to reference the `<name>.tfvars` file directly):
+5. For each Azure IoT Operations component directory under `deploy`, execute the following commands in order (using `deploy/1-infra` as an example):
+   1. From the [deploy/1-infra](deploy/1-infra) directory execute `terraform init` to pull down the latest Terraform providers.
+      ```shell
+      terraform init
+      ```
+   2. From the [deploy/1-infra](deploy/1-infra) directory apply the terraform (the `<unique-name>.auto.tfvars` will automatically be applied):
+       ```shell
+       terraform apply -var-file="../root-<unique-name>.tfvars"
+       ```
+6. Repeat the same process for each of the additional `deploy` directories, as an example, navigate to [deploy/2-aio-orchestrator](deploy/2-aio-orchestrator) and execute:
     ```shell
-    terraform apply -var-file="../<name>.tfvars"
-    ```
-7. Repeat the same process for each of the additional *deploy/* directories, as an example, navigate to [deploy/2-aio-orchestrator](deploy/2-aio-orchestrator) and execute:
-    ```shell
-    terraform apply -var-file="../<name>.tfvars"
+    terraform init -var-file="../root-<unique-name>.tfvars"
+    terraform apply -var-file="../root-<unique-name>.tfvars"
     ```
