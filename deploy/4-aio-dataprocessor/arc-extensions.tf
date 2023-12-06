@@ -35,20 +35,7 @@ resource "azurerm_arc_kubernetes_cluster_extension" "processor" {
     command = <<-EOT
       az customlocation patch -n ${data.azapi_resource.aio_custom_locations.name} -g ${data.azurerm_resource_group.this.name} \
         -c ${join(" ", setunion(local.existing_cluster_extension_ids, [self.id]))}
-      SECONDS=0
-      while :
-      do
-        STATE="$(az customlocation show -n cl-awg-aio-smpl-aio -g rg-awg-aio-smpl --query 'provisioningState' -o json)"
-        if [[ "$STATE" = '"Succeeded"' ]]; then
-          exit 0
-        fi
-        if [[ $SECONDS -gt 300 ]]; then
-          echo "Timed out..."
-          exit 1
-        fi
-        echo "Provisioning State: $STATE"
-        sleep 1
-      done
+      sleep 15
     EOT
   }
 }

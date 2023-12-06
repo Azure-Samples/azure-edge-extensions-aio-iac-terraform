@@ -20,30 +20,9 @@ resource "terraform_data" "register_providers" {
     command = <<-EOT
       az extension add --upgrade --name customlocation -y
       %{for pr in local.providers_to_register~}
-      az provider register -n "${pr}"
+      echo "Registering ${pr}..."
+      az provider register -n "${pr}" --wait
       %{endfor~}
-
-      SECONDS=0
-      while :
-      do
-        if [[ $SECONDS -gt 300 ]]; then
-          echo "Timed out..."
-          exit 1
-        fi
-        NOT_REGISTERED=$(az provider list --query '
-          [?contains(`[${join(", ", local.providers_to_register)}]`, @.namespace)]
-          .{namespace: namespace, registrationState: registrationState}
-          [?registrationState != `Registered`]
-        ' -o json)
-        if [[ "$NOT_REGISTERED" == "[]" ]]; then
-          echo "All Registered!"
-          break
-        else
-          echo "$NOT_REGISTERED"
-          echo "Time elapsed in seconds: $SECONDS"
-        fi
-        sleep 1
-      done
     EOT
   }
 }
