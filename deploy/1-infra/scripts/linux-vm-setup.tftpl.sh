@@ -52,17 +52,17 @@ hash -r
 # Login using a service principal with the following roles:
 # - "Kubernetes Cluster - Azure Arc Onboarding"
 # - "Kubernetes Extension Contributor"
-az login --service-principal --tenant ${tenant_id} --username ${aio_onboard_sp_client_id} --password ${aio_onboard_sp_client_secret}
-az account set --subscription ${subscription_id}
+az login --service-principal --tenant "${tenant_id}" --username "${aio_onboard_sp_client_id}" -p="${aio_onboard_sp_client_secret}"
+az account set --subscription "${subscription_id}"
 
-if [[ "$(az connectedk8s list -g ${resource_group_name} --query 'contains([].name, `${arc_resource_name}`)' -o json)" != "true" ]];
+if [[ "$(az connectedk8s list -g "${resource_group_name}" --query 'contains([].name, `${arc_resource_name}`)' -o json)" != "true" ]];
 then
 # Connect the cluster to Azure Arc.
-az connectedk8s connect -l ${location} -g ${resource_group_name} -n ${arc_resource_name} 
+az connectedk8s connect -l "${location}" -g "${resource_group_name}" -n "${arc_resource_name}"
 fi
 
 # Enable Custom Locations feature.
-az connectedk8s enable-features -g ${resource_group_name} -n ${arc_resource_name} --custom-locations-oid ${custom_locations_oid} --features cluster-connect custom-locations
+az connectedk8s enable-features -g "${resource_group_name}" -n "${arc_resource_name}" --custom-locations-oid "${custom_locations_oid}" --features cluster-connect custom-locations
 
 ###
 # The next set of steps will setup the cluster for Azure IoT Operations.
@@ -77,7 +77,7 @@ az connectedk8s enable-features -g ${resource_group_name} -n ${arc_resource_name
 # permissions in the future, https://learn.microsoft.com/en-us/azure/azure-arc/kubernetes/azure-rbac?tabs=AzureCLI%2Ckubernetes-latest
 kubectl create clusterrolebinding current-user-binding \
   --clusterrole cluster-admin \
-  --user=${cluster_admin_oid} \
+  --user="${cluster_admin_oid}" \
   --dry-run=client -o yaml | kubectl apply -f -
 
 # Create the AIO Namespace where AIO resources will be provisioned.
