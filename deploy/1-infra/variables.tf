@@ -110,6 +110,12 @@ variable "vm_password" {
   sensitive   = true
 }
 
+variable "vm_size" {
+  description = "(Optional) The size of the VM that will be deployed."
+  type        = string
+  default     = "Standard_D4_v4"
+}
+
 variable "admin_object_id" {
   description = "(Optional) The Client ID that will have admin privileges to the new Kubernetes cluster and Azure Key Vault. (Otherwise, uses current logged in user)"
   type        = string

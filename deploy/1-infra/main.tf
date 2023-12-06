@@ -93,7 +93,7 @@ resource "azurerm_linux_virtual_machine" "this" {
   name                  = "vm-${var.name}"
   resource_group_name   = azurerm_resource_group.this.name
   location              = azurerm_resource_group.this.location
-  size                  = "Standard_D4_v5"
+  size                  = var.vm_size
   computer_name         = var.vm_computer_name
   admin_username        = var.vm_username
   patch_assessment_mode = "AutomaticByPlatform"
