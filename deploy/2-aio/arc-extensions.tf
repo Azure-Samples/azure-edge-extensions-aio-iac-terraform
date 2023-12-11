@@ -14,6 +14,10 @@ resource "azurerm_arc_kubernetes_cluster_extension" "aio" {
   cluster_id     = local.cluster_id
   extension_type = "microsoft.iotoperations"
 
+  depends_on = [
+    azurerm_arc_kubernetes_cluster_extension.aks_secrets_provider
+  ]
+
   identity {
     type = "SystemAssigned"
   }

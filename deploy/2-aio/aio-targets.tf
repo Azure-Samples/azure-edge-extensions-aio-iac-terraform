@@ -25,7 +25,7 @@ resource "azapi_resource" "aio_targets_main" {
           "properties" = {
             "chart" = {
               "repo"    = "azureiotoperations.azurecr.io/helm/opentelemetry-collector"
-              "version" = var.aio_extension_version
+              "version" = var.aio_observability_version
             }
             values = yamldecode(file("./manifests/aio-otel-collector-values.yaml"))
           }
