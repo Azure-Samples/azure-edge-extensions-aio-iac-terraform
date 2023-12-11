@@ -20,14 +20,6 @@ resource "azurerm_arc_kubernetes_cluster_extension" "assets" {
   configuration_settings = {
     "Microsoft.CustomLocation.ServiceAccount" = "default"
   }
-
-  provisioner "local-exec" {
-    command = <<-EOT
-      az customlocation patch -n ${data.azapi_resource.aio_custom_locations.name} -g ${data.azurerm_resource_group.this.name} \
-        -c ${join(" ", setunion(local.existing_cluster_extension_ids, [self.id]))}
-      sleep 15
-    EOT
-  }
 }
 
 resource "azurerm_arc_kubernetes_cluster_extension" "akri" {
