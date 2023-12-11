@@ -18,9 +18,7 @@ resource "azapi_resource" "aio_custom_locations" {
     }
   })
 
-  lifecycle {
-    ignore_changes = [body]
-  }
+  ignore_body_changes = ["properties.clusterExtensionIds"]
 }
 
 resource "azapi_resource" "aio_custom_locations_sync" {

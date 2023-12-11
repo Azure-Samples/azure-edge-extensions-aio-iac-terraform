@@ -24,23 +24,4 @@ resource "azurerm_arc_kubernetes_cluster_extension" "mq" {
     "secrets.secretProviderClassName"   = "aio-default-spc"
     "secrets.servicePrincipalSecretRef" = "aio-secrets-store-creds"
   }
-
-  provisioner "local-exec" {
-    command = <<-EOT
-      az customlocation patch -n ${data.azapi_resource.aio_custom_locations.name} -g ${data.azurerm_resource_group.this.name} \
-        -c ${join(" ", setunion(local.existing_cluster_extension_ids, [self.id]))}
-      sleep 15
-    EOT
-  }
-
-  // TODO: Destroy cannot refer to any resource except 'self', which means this needs to be updated to use bash to get the ids, parse them, remove our id, and patch the customlocation
-  /*
-  provisioner "local-exec" {
-    when    = destroy
-    command = <<-EOT
-      az customlocation patch -n ${data.azapi_resource.aio_custom_locations.name} -g ${data.azurerm_resource_group.this.name} \
-        -c ${join(" ", setsubtract(local.existing_cluster_extension_ids, [self.id]))}
-    EOT
-  }
-  */
 }

@@ -30,12 +30,4 @@ resource "azurerm_arc_kubernetes_cluster_extension" "processor" {
     "caTrust.configmapName"                   = var.aio_ca_cm_name
     "serviceAccountTokens.MQClient.audience"  = var.aio_mq_auth_sat_audience
   }
-
-  provisioner "local-exec" {
-    command = <<-EOT
-      az customlocation patch -n ${data.azapi_resource.aio_custom_locations.name} -g ${data.azurerm_resource_group.this.name} \
-        -c ${join(" ", setunion(local.existing_cluster_extension_ids, [self.id]))}
-      sleep 15
-    EOT
-  }
 }

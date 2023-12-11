@@ -5,6 +5,22 @@ data "azapi_resource" "aio_custom_locations" {
   response_export_values = ["properties.clusterExtensionIds"]
 }
 
+resource "azapi_update_resource" "custom_location" {
+  type        = "Microsoft.ExtendedLocation/customLocations@2021-08-31-preview"
+  resource_id = data.azapi_resource.aio_custom_locations.id
+
+  depends_on = [azurerm_arc_kubernetes_cluster_extension.mq]
+
+  body = jsonencode({
+    properties = {
+      clusterExtensionIds = setunion(
+        local.existing_cluster_extension_ids,
+        [azurerm_arc_kubernetes_cluster_extension.mq.id]
+      )
+    }
+  })
+}
+
 resource "azapi_resource" "mq_custom_locations_sync" {
   type      = "Microsoft.ExtendedLocation/customLocations/resourceSyncRules@2021-08-31-preview"
   name      = "${data.azapi_resource.aio_custom_locations.name}-mq-sync"
