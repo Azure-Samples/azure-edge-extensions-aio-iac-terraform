@@ -38,6 +38,7 @@ then
 # Providing the Public IP as a SAN if direct kubectl access from outside host machine is required.
 # Refer to: https://github.com/k3s-io/k3s/issues/1381
 # Makes it easier to copy the k3s.yaml to your ~/.kube/config file and have kubectl work.
+# sudo KUBECONFIG=~/.kube/config:/etc/rancher/k3s/k3s.yaml kubectl config view --flatten
 echo "Starting install of k3s..."
 curl -sfL https://get.k3s.io | sudo INSTALL_K3S_EXEC="--tls-san ${public_ip}" sh -s -
 echo "Finished install of k3s..."

@@ -22,6 +22,12 @@ variable "should_install_akv_extension" {
 variable "aio_extension_version" {
   description = "The AIO Arc Extension version to install into the cluster."
   type        = string
+  default     = "0.2.0-preview"
+}
+
+variable "aio_observability_version" {
+  description = "The AIO OTel observability version to install into the cluster."
+  type        = string
   default     = "0.1.0-preview"
 }
 

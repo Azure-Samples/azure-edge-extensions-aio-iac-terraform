@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: akri-opcua-asset-discovery-daemonset
+  name: aio-opc-asset-discovery
 spec:
   selector:
     matchLabels:
-      name: akri-opcua-asset-discovery
+      name: aio-opc-asset-discovery
   template:
     metadata:
       labels:
-        name: akri-opcua-asset-discovery
+        name: aio-opc-asset-discovery
     spec:
       containers:
-      - name: akri-opcua-asset-discovery
+      - name: aio-opc-asset-discovery
         image: 'mcr.microsoft.com/azureiotoperations/opcuabroker/discovery-handler:${aio_extension_version}'
         imagePullPolicy: Always
         resources:

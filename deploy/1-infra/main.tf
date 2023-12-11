@@ -172,6 +172,10 @@ resource "local_sensitive_file" "linux_vm_setup" {
 }
 */
 
+// Downloads and runs at /var/lib/waagent/custom-script/download/0 on the VM.
+// If there are problems then check the logs at the following locations on the VM.
+// - stdout -> /var/lib/waagent/custom-script/download/0/stdout
+// - stderr -> /var/lib/waagent/custom-script/download/0/stderr
 resource "azurerm_virtual_machine_extension" "linux_setup" {
   count                       = var.should_use_linux ? 1 : 0
   name                        = "linux-vm-setup"

@@ -32,7 +32,7 @@ resource "azapi_resource" "aio_targets_opc_ua_broker" {
           type = "helm.v3"
           properties = {
             chart = {
-              repo    = "oci://mcr.microsoft.com/azureiotoperations/opcuabroker/helmchart/microsoft.iotoperations.opcuabroker"
+              repo    = "oci://mcr.microsoft.com/azureiotoperations/opcuabroker/helmchart/microsoft-iotoperations-opcuabroker"
               version = var.aio_extension_version
             }
             values = yamldecode(

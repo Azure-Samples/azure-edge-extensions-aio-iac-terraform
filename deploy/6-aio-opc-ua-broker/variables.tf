@@ -16,7 +16,7 @@ variable "location" {
 variable "aio_extension_version" {
   description = "The AIO Arc Extension version to install into the cluster."
   type        = string
-  default     = "0.1.0-preview"
+  default     = "0.2.0-preview"
 }
 
 variable "aio_extension_release_train" {
