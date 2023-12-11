@@ -27,7 +27,7 @@ resource "azapi_resource" "processor_custom_locations_sync" {
   location  = var.location
   parent_id = data.azapi_resource.aio_custom_locations.id
 
-  depends_on = [azurerm_arc_kubernetes_cluster_extension.processor]
+  depends_on = [azapi_update_resource.custom_location]
 
   body = jsonencode({
     properties = {
