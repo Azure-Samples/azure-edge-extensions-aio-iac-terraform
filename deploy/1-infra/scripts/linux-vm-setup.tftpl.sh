@@ -2,13 +2,13 @@
 
 set -e
 
+# Wait for initial startup processes to finishes
+sleep 30
+
 ###
 # The following steps condense down the quick start instructions for AIO:
 # https://learn.microsoft.com/azure/iot-operations/get-started/quickstart-deploy?tabs=linux#connect-a-kubernetes-cluster-to-azure-arc
 ###
-
-# Required for PersistentVolumeClaims in k3s.
-sudo apt install -y nfs-common || true
 
 # Increase file handles and watches.
 echo fs.inotify.max_user_instances=8192 | sudo tee -a /etc/sysctl.conf
@@ -21,7 +21,6 @@ sudo sysctl -p
 # Download and install Azure CLI and K3S.
 ###
 
-
 if [[ -n "$(hash az 2>&1)" ]];
 then
 # Install Azure CLI, used to connect new cluster to Azure Arc and enable Custom Location features.
@@ -29,6 +28,10 @@ echo "Starting install of Azure CLI..."
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash -s -- -y
 echo "Finished install of Azure CLI..."
 fi
+
+# Required for PersistentVolumeClaims in k3s.
+sudo apt-get install -y nfs-common
+#sudo apt-get install nfs-common || true
 
 if [[ -n "$(hash k3s 2>&1)" ]];
 then
