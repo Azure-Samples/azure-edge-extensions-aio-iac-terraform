@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: aio-opc-asset-discovery
+spec:
+  selector:
+    matchLabels:
+      name: aio-opc-asset-discovery
+  template:
+    metadata:
+      labels:
+        name: aio-opc-asset-discovery
+    spec:
+      containers:
+      - name: aio-opc-asset-discovery
+        image: 'mcr.microsoft.com/azureiotoperations/opcuabroker/discovery-handler:${aio_extension_version}'
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: 64Mi
+            cpu: 10m
+          limits:
+            memory: 300Mi
+            cpu: 100m
+        ports:
+        - name: discovery
+          containerPort: 80
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: DISCOVERY_HANDLERS_DIRECTORY
+          value: /var/lib/akri
+        volumeMounts:
+        - name: discovery-handlers
+          mountPath: /var/lib/akri
+      volumes:
+      - name: discovery-handlers
+        hostPath:
+          path: /var/lib/akri
