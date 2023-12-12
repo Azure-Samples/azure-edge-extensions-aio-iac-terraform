@@ -8,7 +8,7 @@ resource "azapi_resource" "aio_targets_opc_plc_sim" {
 
   body = jsonencode({
     extendedLocation = {
-      name = data.azapi_resource.aio_custom_locations.id
+      name = local.custom_locations_id
       type = "CustomLocation"
     }
 
@@ -73,7 +73,7 @@ resource "azapi_resource" "aio_targets_mqtt_client" {
 
   body = jsonencode({
     extendedLocation = {
-      name = data.azapi_resource.aio_custom_locations.id
+      name = local.custom_locations_id
       type = "CustomLocation"
     }
 

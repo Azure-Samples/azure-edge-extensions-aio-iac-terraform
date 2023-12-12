@@ -9,7 +9,7 @@ resource "azapi_resource" "opc_sim_aep" {
 
   body = jsonencode({
     extendedLocation = {
-      name = data.azapi_resource.aio_custom_locations.id
+      name = local.custom_locations_id
       type = "CustomLocation"
     }
     properties = {
@@ -36,7 +36,7 @@ resource "azapi_resource" "opc_sim_asset" {
 
   body = jsonencode({
     extendedLocation = {
-      name = data.azapi_resource.aio_custom_locations.id
+      name = local.custom_locations_id
       type = "CustomLocation"
     }
     properties = {

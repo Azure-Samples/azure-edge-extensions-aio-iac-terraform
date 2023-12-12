@@ -13,6 +13,24 @@ variable "location" {
   default = "westus3"
 }
 
+variable "resource_group_name" {
+  description = "(Optional) The resource group name where the Azure Arc Cluster resource is located. (Otherwise, 'rg-<var.name>')"
+  type        = string
+  default     = null
+}
+
+variable "arc_cluster_name" {
+  description = "(Optional) the Arc Cluster resource name. (Otherwise, 'arc-<var.name>')"
+  type        = string
+  default     = null
+}
+
+variable "custom_locations_name" {
+  description = "(Optional) the Custom Locations resource name. (Otherwise, 'cl-<var.name>-aio')"
+  type        = string
+  default     = null
+}
+
 variable "aio_cluster_namespace" {
   description = "The namespace in the Arc Cluster where AIO resources will be installed."
   type        = string
