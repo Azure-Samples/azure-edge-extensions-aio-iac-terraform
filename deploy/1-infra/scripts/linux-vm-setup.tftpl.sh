@@ -26,6 +26,11 @@ then
 # Install Azure CLI, used to connect new cluster to Azure Arc and enable Custom Location features.
 echo "Starting install of Azure CLI..."
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash -s -- -y
+
+# Update bash command cache for new `az` and `kubectl` commands.
+hash -r
+az config set extension.use_dynamic_install=yes_without_prompt
+
 echo "Finished install of Azure CLI..."
 fi
 
@@ -41,13 +46,13 @@ then
 # sudo KUBECONFIG=~/.kube/config:/etc/rancher/k3s/k3s.yaml kubectl config view --flatten
 echo "Starting install of k3s..."
 curl -sfL https://get.k3s.io | sudo INSTALL_K3S_EXEC="--tls-san ${public_ip}" sh -s -
+
+# Update bash command cache for new `az` and `kubectl` commands.
+hash -r
 echo "Finished install of k3s..."
 fi
 
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
-
-# Update bash command cache for new `az` and `kubectl` commands.
-hash -r
 
 ###
 # The following steps will connect the new cluster to an Azure Arc resource in the provided Resource Group.
@@ -67,6 +72,12 @@ fi
 
 # Enable Custom Locations feature.
 az connectedk8s enable-features -g "${resource_group_name}" -n "${arc_resource_name}" --custom-locations-oid "${custom_locations_oid}" --features cluster-connect custom-locations
+
+if [[ "$(az k8s-extension list -g "${resource_group_name}" -c "${arc_resource_name}" -t connectedClusters --query 'contains([].name, `aks-secrets-provider`)' -o json)" != "true" ]];
+then
+# Add Azure Key Vault Secrets Store CSI Driver
+az k8s-extension create -g "${resource_group_name}" -c "${arc_resource_name}" -n "aks-secrets-provider" -t "connectedClusters" --extension-type "Microsoft.AzureKeyVaultSecretsProvider" 
+fi
 
 ###
 # The next set of steps will setup the cluster for Azure IoT Operations.
@@ -103,6 +114,11 @@ kubectl label secret ${aio_akv_sp_secret_name} \
 # Apply the Secret that contains the tls.crt and tls.key for AIO.
 kubectl apply -f - <<EOF
 ${aio_ca_cert_trust_secret}
+EOF
+
+# Apply the SecretProviderClass required for AIO.
+kubectl apply -f - <<EOF
+${aio_default_spc}
 EOF
 
 # Apply the ConfigMap that contains just the ca.crt (the tls.crt from above).

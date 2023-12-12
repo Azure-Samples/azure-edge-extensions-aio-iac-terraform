@@ -174,6 +174,13 @@ variable "aio_akv_sp_secret_name" {
   nullable    = false
 }
 
+variable "aio_spc_name" {
+  description = "(Optional) The name of the SecretProviderClass Kubernetes object that's required by AIO. (Otherwise, 'aio-default-spc')"
+  type        = string
+  default     = "aio-default-spc"
+  nullable    = false
+}
+
 variable "vnet_address_space" {
   description = "(Optional) The VNET address space for the VM. (Otherwise, '10.0.0.0/16')"
   type        = string
