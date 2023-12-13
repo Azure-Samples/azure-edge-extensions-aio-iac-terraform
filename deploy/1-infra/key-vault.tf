@@ -42,10 +42,20 @@ resource "azurerm_key_vault_access_policy" "aio_kv_current_user" {
 
 // Create the placeholder secret used by AIO.
 
+resource "random_password" "aio_placeholder" {
+  count   = var.aio_placeholder_secret_value == null ? 1 : 0
+  length  = 18
+  special = true
+}
+
+locals {
+  aio_placeholder_secret = var.aio_placeholder_secret_value != null ? var.aio_placeholder_secret_value : random_password.aio_placeholder[0].result
+}
+
 resource "azurerm_key_vault_secret" "aio_placeholder" {
   name         = "placeholder-secret"
   key_vault_id = azurerm_key_vault.aio_kv.id
-  value        = var.aio_placeholder_secret_value
+  value        = local.aio_placeholder_secret
 
   depends_on = [
     azurerm_key_vault_access_policy.aio_kv_admin_user,
@@ -66,3 +76,10 @@ resource "azurerm_key_vault_access_policy" "aio_sp" {
   storage_permissions     = ["Get", "List"]
 }
 
+resource "azurerm_key_vault_access_policy" "aio_onboard_sp" {
+  key_vault_id = azurerm_key_vault.aio_kv.id
+  object_id    = local.aio_onboard_sp_object_id
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+
+  secret_permissions = ["Set", "List"]
+}

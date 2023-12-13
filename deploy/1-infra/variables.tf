@@ -20,9 +20,9 @@ variable "aio_cluster_namespace" {
 }
 
 variable "aio_placeholder_secret_value" {
-  description = "The value for the placeholder secret that will be used by AIO (can be anything)."
+  description = "(Optional) The value for the placeholder secret that will be used by AIO, can be anything. (Otherwise, random string)"
   type        = string
-  nullable    = false
+  default     = null
 }
 
 variable "resource_group_name" {
@@ -118,6 +118,13 @@ variable "vm_size" {
 
 variable "admin_object_id" {
   description = "(Optional) The Client ID that will have admin privileges to the new Kubernetes cluster and Azure Key Vault. (Otherwise, uses current logged in user)"
+  type        = string
+  default     = null
+  nullable    = true
+}
+
+variable "aio_onboard_sp_object_id" {
+  description = "(Optional) The Service Principal Object ID for onboarding the cluster to Arc. (Otherwise, creates new one)"
   type        = string
   default     = null
   nullable    = true

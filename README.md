@@ -54,7 +54,6 @@ This project utilizes Terraform to do the following:
     vm_computer_name             = "<computer-name>"
     vm_username                  = "<computer-username>"
     vm_ssh_pub_key_file          = "~/.ssh/<generated-public-ssh-key>.pub"
-    aio_placeholder_secret_value = "<placeholder-secret-value"
     ```
 5. From the [deploy/1-infra](deploy/1-infra) directory execute the following (the `<unique-name>.auto.tfvars` created earlier will automatically be applied):
    ```shell

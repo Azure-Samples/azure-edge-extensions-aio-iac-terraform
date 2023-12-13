@@ -11,6 +11,7 @@ locals {
 
   admin_object_id = var.admin_object_id == null ? data.azurerm_client_config.current.object_id : var.admin_object_id
 
+  aio_onboard_sp_object_id     = var.should_create_aio_onboard_sp ? azuread_service_principal.aio_onboard_sp[0].object_id : var.aio_onboard_sp_object_id
   aio_onboard_sp_client_id     = var.should_create_aio_onboard_sp ? azuread_service_principal.aio_onboard_sp[0].client_id : var.aio_onboard_sp_client_id
   aio_onboard_sp_client_secret = var.should_create_aio_onboard_sp ? azuread_application_password.aio_onboard_sp[0].value : var.aio_onboard_sp_client_secret
   aio_sp_object_id             = var.should_create_aio_akv_sp ? azuread_service_principal.aio_sp[0].object_id : var.aio_akv_sp_client_id
@@ -158,6 +159,7 @@ locals {
     custom_locations_oid = data.azuread_service_principal.custom_locations_rp.object_id
 
     aio_cluster_namespace    = var.aio_cluster_namespace
+    aio_kv_name              = azurerm_key_vault.aio_kv.name
     aio_akv_sp_secret_name   = var.aio_akv_sp_secret_name
     aio_default_spc          = templatefile("./manifests/aio-default-spc.tftpl.yaml", local.aio_default_spc_params)
     aio_sp_client_id         = local.aio_sp_client_id
