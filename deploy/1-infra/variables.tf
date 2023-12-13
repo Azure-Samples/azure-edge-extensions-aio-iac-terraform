@@ -3,8 +3,8 @@ variable "name" {
   type        = string
   nullable    = false
   validation {
-    condition     = var.name != "sample-aio" && length(var.name) < 15
-    error_message = "Please update 'name' to a short, unique name."
+    condition     = var.name != "sample-aio" && length(var.name) < 15 && can(regex("^[a-z0-9][a-z0-9-]{1,60}[a-z0-9]$", var.name))
+    error_message = "Please update 'name' to a short, unique name, that only has lowercase letters, numbers, '-' hyphens."
   }
 }
 
