@@ -119,6 +119,13 @@ resource "azurerm_linux_virtual_machine" "this" {
     sku       = "22_04-lts-gen2"
     version   = "latest"
   }
+
+  depends_on = [
+    azurerm_key_vault_access_policy.aio_kv_admin_user,
+    azurerm_key_vault_access_policy.aio_kv_current_user,
+    azurerm_key_vault_access_policy.aio_onboard_sp,
+    azurerm_key_vault_access_policy.aio_sp,
+  ]
 }
 
 ///

@@ -95,6 +95,10 @@ variable "vm_username" {
   description = "The Username used to login to the VM."
   type        = string
   nullable    = false
+  validation {
+    condition     = can(regex("^[a-z0-9][a-z0-9-]{1,60}[a-z0-9]$", var.vm_username))
+    error_message = "Please update 'vm_username' which only has lowercase letters, numbers, '-' hyphens."
+  }
 }
 
 variable "vm_ssh_pub_key_file" {

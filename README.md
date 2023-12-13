@@ -20,11 +20,34 @@ This project utilizes Terraform to do the following:
 
 ### Prerequisites
 
-- (Windows) [WSL](https://learn.microsoft.com/windows/wsl/install) installed and setup.
+- (Optionally for Windows) [WSL](https://learn.microsoft.com/windows/wsl/install) installed and setup.
 - [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) available on the command line where this will be deployed.
 - [Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli) available on the command line where this will be deployed.
 - (Optional) Owner access to a Subscription to deploy the infrastructure.
-- (Or) Owner access to a Resource Group with an existing cluster configured and connected to Azure Arc. 
+  - (Or) Owner access to a Resource Group with an existing cluster configured and connected to Azure Arc. 
+
+### Providers Registered
+
+[1-infra](deploy/1-infra) will attempt to register all of the necessary Azure providers but if you are running this deployment on a Windows machine you may still need to manually register the providers due to limitations with Terraform's `local-exec`.
+
+```shell
+az provider register -n "Microsoft.ExtendedLocation"
+az provider register -n "Microsoft.Kubernetes"
+az provider register -n "Microsoft.KubernetesConfiguration"
+az provider register -n "Microsoft.IoTOperationsOrchestrator"
+az provider register -n "Microsoft.IoTOperationsMQ"
+az provider register -n "Microsoft.IoTOperationsDataProcessor"
+az provider register -n "Microsoft.DeviceRegistry"
+
+# Verify the providers are registered with the following commands
+az provider show -n "Microsoft.ExtendedLocation" --query "registrationState"
+az provider show -n "Microsoft.Kubernetes" --query "registrationState"
+az provider show -n "Microsoft.KubernetesConfiguration" --query "registrationState"
+az provider show -n "Microsoft.IoTOperationsOrchestrator" --query "registrationState"
+az provider show -n "Microsoft.IoTOperationsMQ" --query "registrationState"
+az provider show -n "Microsoft.IoTOperationsDataProcessor" --query "registrationState"
+az provider show -n "Microsoft.DeviceRegistry" --query "registrationState"
+```
 
 ### Quickstart
 
@@ -49,7 +72,7 @@ This project utilizes Terraform to do the following:
     name = "<unique-name>"
     location = "<location>"
     ```
-4. Add a `<unique-name>.auto.tfvars` to the [deploy/1-infra](deploy/1-infra) directory that contains the following required variables (refer to the [deploy/sample-aio.auto.tfvars.example](deploy/1-infra/sample-aio.auto.tfvars.example) for an example):
+4. Add a `<unique-name>.auto.tfvars` to the [deploy/1-infra](deploy/1-infra) directory that contains the following required variables (refer to the [deploy/1-infra/sample-aio.auto.tfvars.example](deploy/1-infra/sample-aio.auto.tfvars.example) for an example):
     ```hcl
     // <project-root>/deploy/1-infra/<unique-name>.auto.tfvars
 
@@ -68,7 +91,9 @@ This project utilizes Terraform to do the following:
    terraform apply -var-file="../root-<unique-name>.tfvars"
    ```
    
-## Deploying into Existing Cluster
+## Deploying into an Existing Arc Connected Cluster
+
+> NOTE: Follow these instructions if you want to skip `1-infra` and are only wanting to use `2-aio-full` and/or `3-opc-plc-sim`.
 
 It is possible to use this repository to deploy Azure IoT Operations to an existing Azure Arc enabled cluster in an existing Resource Group. Ensure your cluster is setup and configured with the following prerequisites before deploying Azure IoT Operations.
 
