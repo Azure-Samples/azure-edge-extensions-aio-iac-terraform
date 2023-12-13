@@ -20,6 +20,7 @@ This project utilizes Terraform to do the following:
 
 ### Prerequisites
 
+- (Windows) [WSL](https://learn.microsoft.com/windows/wsl/install) installed and setup.
 - [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) available on the command line where this will be deployed.
 - [Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli) available on the command line where this will be deployed.
 - (Optional) Owner access to a Subscription to deploy the infrastructure.
