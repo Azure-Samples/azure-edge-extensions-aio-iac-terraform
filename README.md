@@ -30,11 +30,12 @@ This project utilizes Terraform to do the following:
 
 1. Generate a new ssh key to use with the new VM (replace the `<computer-username>` with the username that will be used for the VM):
     ```shell
-    ssh-keygen -t rsa -b 4096 -C "<computer-username>"
+    ssh-keygen -t rsa -b 4096 -C "<computer-username>" -f ~/.ssh/id_aio_rsa
+    # Press enter twice unless you want a passphrase
     ```
 2. Login to the AZ CLI:
     ```shell
-      az login --tenant <tenant>.onmicrosoft.com
+    az login --tenant <tenant>.onmicrosoft.com
     ```
    - Make sure your subscription is the one that you would like to use: `az account show`.
    - Change to the subscription that you would like to use if needed:
@@ -54,7 +55,7 @@ This project utilizes Terraform to do the following:
 
     vm_computer_name             = "<computer-name>"
     vm_username                  = "<computer-username>"
-    vm_ssh_pub_key_file          = "~/.ssh/<generated-public-ssh-key>.pub"
+    vm_ssh_pub_key_file          = "~/.ssh/id_aio_rsa.pub"
     ```
 5. From the [deploy/1-infra](deploy/1-infra) directory execute the following (the `<unique-name>.auto.tfvars` created earlier will automatically be applied):
    ```shell
