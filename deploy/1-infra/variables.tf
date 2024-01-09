@@ -49,12 +49,6 @@ variable "should_use_linux" {
   }
 }
 
-variable "should_register_azure_providers" {
-  description = "Registers all AIO 'Microsoft.*' providers to the subscription. (Not needed if this was done previously)"
-  type        = bool
-  default     = true
-}
-
 variable "should_allow_list_wan_ip" {
   description = "Creates NSG security rules based on current or provided WAN IP address."
   type        = bool
@@ -73,6 +67,12 @@ variable "should_allow_list_kubectl_port" {
   default     = false
 }
 
+variable "should_allow_list_rdp_port" {
+  description = "Creates NSG rule to allow WAN IP address to access port 3389."
+  type        = bool
+  default     = false
+}
+
 variable "should_create_aio_onboard_sp" {
   description = "Creates a new Service Principal with 'Kubernetes Cluster - Azure Arc Onboarding' and 'Kubernetes Extension Contributor' roles for onboarding the new cluster to Arc."
   type        = bool
@@ -83,6 +83,18 @@ variable "should_create_aio_akv_sp" {
   description = "Creates a new Service Principal with 'Get' and 'List' permissions on Azure Key Vault for AIO to use in the cluster."
   type        = bool
   default     = true
+}
+
+variable "should_create_aio_resource_provider_register_role" {
+  description = "Creates a new role that has permissions to register all of the AIO resources."
+  type        = bool
+  default     = true
+}
+
+variable "aio_resource_provider_register_role_name" {
+  description = "(Optional) The name for the role that has permissions to register all of the AIO resources."
+  type        = string
+  default     = null
 }
 
 variable "vm_computer_name" {

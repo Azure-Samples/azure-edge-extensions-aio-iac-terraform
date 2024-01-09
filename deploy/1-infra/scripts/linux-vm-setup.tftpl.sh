@@ -64,6 +64,16 @@ export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 az login --service-principal --tenant "${tenant_id}" --username "${aio_onboard_sp_client_id}" -p="${aio_onboard_sp_client_secret}"
 az account set --subscription "${subscription_id}"
 
+echo "Registering resource providers required by AIO..."
+
+az provider register -n "Microsoft.ExtendedLocation" --wait
+az provider register -n "Microsoft.Kubernetes" --wait
+az provider register -n "Microsoft.KubernetesConfiguration" --wait
+az provider register -n "Microsoft.IoTOperationsOrchestrator" --wait
+az provider register -n "Microsoft.IoTOperationsMQ" --wait
+az provider register -n "Microsoft.IoTOperationsDataProcessor" --wait
+az provider register -n "Microsoft.DeviceRegistry" --wait
+
 if [[ "$(az connectedk8s list -g "${resource_group_name}" --query 'contains([].name, `${arc_resource_name}`)' -o json)" != "true" ]];
 then
 # Connect the cluster to Azure Arc.

@@ -55,15 +55,13 @@ resource "azurerm_network_interface" "this" {
 // - Hypervisor support if using Windows for AKS EE.
 ///
 
-// TODO: Windows VM setup is currently not implemented. Requires install script similar to linux-vm-setup.tftpl.sh
-/*
 resource "azurerm_windows_virtual_machine" "this" {
   count = var.should_use_linux ? 0 : 1
 
   name                                                   = "vm-${var.name}"
   resource_group_name                                    = azurerm_resource_group.this.name
   location                                               = azurerm_resource_group.this.location
-  size                                                   = "Standard_D4_v5"
+  size                                                   = var.vm_size
   computer_name                                          = var.vm_computer_name
   admin_username                                         = var.vm_username
   admin_password                                         = var.vm_password
@@ -85,8 +83,21 @@ resource "azurerm_windows_virtual_machine" "this" {
     sku       = "2022-Datacenter"
     version   = "latest"
   }
+
+  depends_on = [
+    azurerm_key_vault_access_policy.aio_kv_admin_user,
+    azurerm_key_vault_access_policy.aio_kv_current_user,
+    azurerm_key_vault_access_policy.aio_onboard_sp,
+    azurerm_key_vault_access_policy.aio_sp,
+  ]
+
+  lifecycle {
+    precondition {
+      condition     = var.vm_password != ""
+      error_message = "'vm_password' required for Windows VMs."
+    }
+  }
 }
-*/
 
 resource "azurerm_linux_virtual_machine" "this" {
   count = var.should_use_linux ? 1 : 0
@@ -204,6 +215,28 @@ resource "azurerm_virtual_machine_extension" "linux_setup" {
   failure_suppression_enabled = false
   protected_settings          = <<SETTINGS
   {
+    "script": "${base64encode(local.linux_vm_setup)}"
+  }
+  SETTINGS
+}
+
+// TODO: the AksEdgeQuickStartForAio.ps1 requires a restart to enable nested virtualization which means this does not work. Find a work around...
+resource "azurerm_virtual_machine_extension" "windows_setup" {
+  count                       = var.should_use_linux ? 0 : 1
+  name                        = "windows-vm-setup"
+  virtual_machine_id          = azurerm_windows_virtual_machine.this[0].id
+  publisher                   = "Microsoft.Compute"
+  type                        = "CustomScriptExtension"
+  type_handler_version        = "1.10.15"
+  automatic_upgrade_enabled   = false
+  auto_upgrade_minor_version  = false
+  failure_suppression_enabled = false
+  protected_settings          = <<SETTINGS
+  {
+    "fileUris": [
+      "https://aka.ms/installazurecliwindowsx64",
+      "https://raw.githubusercontent.com/Azure/AKS-Edge/main/tools/scripts/AksEdgeQuickStart/AksEdgeQuickStartForAio.ps1"
+    ],
     "script": "${base64encode(local.linux_vm_setup)}"
   }
   SETTINGS
