@@ -1,6 +1,6 @@
 resource "azapi_resource" "aio_targets_main" {
   schema_validation_enabled = false
-  type                      = "Microsoft.IoTOperationsOrchestrator/Targets@2023-10-04-preview"
+  type                      = "Microsoft.IoTOperationsOrchestrator/targets@2023-10-04-preview"
   name                      = "${var.name}-tgt-main"
   location                  = var.location
   parent_id                 = data.azurerm_resource_group.this.id
@@ -24,7 +24,7 @@ resource "azapi_resource" "aio_targets_main" {
           "type" = "helm.v3"
           "properties" = {
             "chart" = {
-              "repo"    = "azureiotoperations.azurecr.io/helm/opentelemetry-collector"
+              "repo"    = "mcr.microsoft.com/azureiotoperations/helm/aio-opentelemetry-collector"
               "version" = var.aio_observability_version
             }
             values = yamldecode(file("./manifests/aio-otel-collector-values.yaml"))
@@ -60,7 +60,7 @@ resource "azapi_resource" "aio_targets_mq" {
   count = var.enable_aio_mq ? 1 : 0
 
   schema_validation_enabled = false
-  type                      = "Microsoft.IoTOperationsOrchestrator/Targets@2023-10-04-preview"
+  type                      = "Microsoft.IoTOperationsOrchestrator/targets@2023-10-04-preview"
   name                      = "${var.name}-tgt-mq"
   location                  = var.location
   parent_id                 = data.azurerm_resource_group.this.id
@@ -113,7 +113,7 @@ resource "azapi_resource" "aio_targets_opc_ua_broker" {
   count = var.enable_aio_opc_ua_broker ? 1 : 0
 
   schema_validation_enabled = false
-  type                      = "Microsoft.IoTOperationsOrchestrator/Targets@2023-10-04-preview"
+  type                      = "Microsoft.IoTOperationsOrchestrator/targets@2023-10-04-preview"
   name                      = "${var.name}-tgt-oub"
   location                  = var.location
   parent_id                 = data.azurerm_resource_group.this.id

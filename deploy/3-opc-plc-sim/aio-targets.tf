@@ -1,7 +1,7 @@
 resource "azapi_resource" "aio_targets_opc_plc_sim" {
   count                     = var.should_install_opc_plc_simulator ? 1 : 0
   schema_validation_enabled = false
-  type                      = "Microsoft.IoTOperationsOrchestrator/Targets@2023-10-04-preview"
+  type                      = "Microsoft.IoTOperationsOrchestrator/targets@2023-10-04-preview"
   name                      = "${var.name}-tgt-sim"
   location                  = var.location
   parent_id                 = data.azurerm_resource_group.this.id
@@ -66,7 +66,7 @@ resource "azapi_resource" "aio_targets_opc_plc_sim" {
 resource "azapi_resource" "aio_targets_mqtt_client" {
   count                     = var.should_install_insecure_mqtt_client_for_mqttui ? 1 : 0
   schema_validation_enabled = false
-  type                      = "Microsoft.IoTOperationsOrchestrator/Targets@2023-10-04-preview"
+  type                      = "Microsoft.IoTOperationsOrchestrator/targets@2023-10-04-preview"
   name                      = "${var.name}-tgt-mc"
   location                  = var.location
   parent_id                 = data.azurerm_resource_group.this.id

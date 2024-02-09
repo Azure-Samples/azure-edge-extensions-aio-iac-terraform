@@ -7,7 +7,7 @@ variable "enable_aio_dataprocessor" {
 variable "aio_dataprocessor_extension_version" {
   description = "The Azure IoT Data Processor Arc Extension version to install into the cluster."
   type        = string
-  default     = "0.1.1-preview"
+  default     = "0.1.2-preview"
 }
 
 variable "aio_dataprocessor_extension_release_train" {
