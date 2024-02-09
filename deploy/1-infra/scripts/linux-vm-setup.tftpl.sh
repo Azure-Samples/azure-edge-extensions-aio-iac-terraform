@@ -76,7 +76,12 @@ az connectedk8s enable-features -g "${resource_group_name}" -n "${arc_resource_n
 if [[ "$(az k8s-extension list -g "${resource_group_name}" -c "${arc_resource_name}" -t connectedClusters --query 'contains([].name, `aks-secrets-provider`)' -o json)" != "true" ]];
 then
 # Add Azure Key Vault Secrets Store CSI Driver
-az k8s-extension create -g "${resource_group_name}" -c "${arc_resource_name}" -n "aks-secrets-provider" -t "connectedClusters" --extension-type "Microsoft.AzureKeyVaultSecretsProvider" 
+az k8s-extension create -g "${resource_group_name}" \
+  -c "${arc_resource_name}" \
+  -n "aks-secrets-provider" \
+  -t "connectedClusters" \
+  --extension-type "Microsoft.AzureKeyVaultSecretsProvider" \
+  --configuration-settings secrets-store-csi-driver.enableSecretRotation=true secrets-store-csi-driver.syncSecret.enabled=true
 fi
 
 ###
