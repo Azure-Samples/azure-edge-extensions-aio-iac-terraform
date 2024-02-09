@@ -15,9 +15,9 @@ resource "azurerm_arc_kubernetes_cluster_extension" "aio" {
   configuration_settings = {
     "rbac.cluster.admin"                      = "true"
     "aioTrust.enabled"                        = "true"
-    "aioTrust.secretName"                     = var.aio_ca_secret_name
-    "aioTrust.configmapName"                  = var.aio_ca_cm_name
-    "aioTrust.issuerName"                     = var.aio_ca_issuer_name
+    "aioTrust.secretName"                     = var.aio_trust_secret_name
+    "aioTrust.configmapName"                  = var.aio_trust_config_map_name
+    "aioTrust.issuerName"                     = var.aio_trust_issuer_name
     "Microsoft.CustomLocation.ServiceAccount" = "default"
     "otelCollectorAddress"                    = local.aio_otel_collector_address_no_protocol
     "genevaCollectorAddress"                  = local.aio_geneva_collector_address_no_protocol
@@ -109,7 +109,7 @@ resource "azurerm_arc_kubernetes_cluster_extension" "processor" {
     "secrets.secretProviderClassName"         = var.aio_spc_name
     "secrets.servicePrincipalSecretRef"       = var.aio_csi_secret_name
     "caTrust.enabled"                         = "true"
-    "caTrust.configmapName"                   = var.aio_ca_cm_name
+    "caTrust.configmapName"                   = var.aio_trust_config_map_name
     "serviceAccountTokens.MQClient.audience"  = var.aio_mq_auth_sat_audience
   }
 }

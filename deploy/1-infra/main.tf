@@ -144,7 +144,7 @@ locals {
     aio_tenant_id         = data.azurerm_client_config.current.tenant_id
   }
   aio_ca_cert_trust_secret_params = {
-    aio_ca_secret_name    = var.aio_ca_secret_name
+    aio_trust_secret_name = var.aio_trust_secret_name
     aio_cluster_namespace = var.aio_cluster_namespace
     aio_ca_cert_pem       = base64encode(tls_self_signed_cert.ca.cert_pem)
     aio_ca_key_pem        = base64encode(tls_private_key.ca.private_key_pem)
@@ -165,14 +165,15 @@ locals {
 
     custom_locations_oid = data.azuread_service_principal.custom_locations_rp.object_id
 
-    aio_cluster_namespace    = var.aio_cluster_namespace
-    aio_kv_name              = azurerm_key_vault.aio_kv.name
-    aio_akv_sp_secret_name   = var.aio_akv_sp_secret_name
-    aio_default_spc          = templatefile("./manifests/aio-default-spc.tftpl.yaml", local.aio_default_spc_params)
-    aio_sp_client_id         = local.aio_sp_client_id
-    aio_sp_client_secret     = local.aio_sp_client_secret
-    aio_ca_cert_pem          = tls_self_signed_cert.ca.cert_pem
-    aio_ca_cert_trust_secret = templatefile("./manifests/aio-ca-cert-trust-secret.tftpl.yaml", local.aio_ca_cert_trust_secret_params)
+    aio_cluster_namespace     = var.aio_cluster_namespace
+    aio_kv_name               = azurerm_key_vault.aio_kv.name
+    aio_akv_sp_secret_name    = var.aio_akv_sp_secret_name
+    aio_default_spc           = templatefile("./manifests/aio-default-spc.tftpl.yaml", local.aio_default_spc_params)
+    aio_sp_client_id          = local.aio_sp_client_id
+    aio_sp_client_secret      = local.aio_sp_client_secret
+    aio_trust_config_map_name = var.aio_trust_config_map_name
+    aio_ca_cert_pem           = tls_self_signed_cert.ca.cert_pem
+    aio_ca_cert_trust_secret  = templatefile("./manifests/aio-ca-cert-trust-secret.tftpl.yaml", local.aio_ca_cert_trust_secret_params)
   }
 
   linux_vm_setup = templatefile("./scripts/linux-vm-setup.tftpl.sh", local.linux_vm_setup_params)

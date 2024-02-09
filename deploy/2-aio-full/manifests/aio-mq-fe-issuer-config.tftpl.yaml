@@ -5,4 +5,4 @@ metadata:
   namespace: ${aio_cluster_namespace}
 spec:
   ca:
-    secretName: secret-tls
+    secretName: ${aio_trust_secret_name}

@@ -34,7 +34,7 @@ variable "custom_locations_name" {
 variable "aio_cluster_namespace" {
   description = "The namespace in the Arc Cluster where AIO resources will be installed."
   type        = string
-  default     = "aio"
+  default     = "azure-iot-operations"
 }
 
 variable "aio_targets_main_version" {
@@ -73,10 +73,10 @@ variable "aio_mq_auth_sat_audience" {
   default     = "aio-mq"
 }
 
-variable "aio_ca_cm_name" {
+variable "aio_trust_config_map_name" {
   description = "The trust bundle ConfigMap name."
   type        = string
-  default     = "aio-ca-trust-bundle"
+  default     = "aio-ca-trust-bundle-test-only"
 }
 
 variable "opc_sim_endpoint_name" {

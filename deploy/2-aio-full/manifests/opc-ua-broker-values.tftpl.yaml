@@ -2,7 +2,7 @@ mqttBroker:
   authenticationMethod: serviceAccountToken
   serviceAccountTokenAudience: '${aio_mq_auth_sat_audience}'
   address: '${aio_mq_local_url}'
-  caCertConfigMapRef: '${aio_ca_cm_name}'
+  caCertConfigMapRef: '${aio_trust_config_map_name}'
   caCertKey: '${aio_ca_cm_cert_name}'
   connectUserProperties:
     metriccategory: aio-opc

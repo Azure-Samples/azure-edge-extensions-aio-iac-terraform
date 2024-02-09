@@ -87,6 +87,7 @@ resource "azapi_resource" "aio_targets_mq" {
             resource = yamldecode(templatefile("./manifests/aio-mq-fe-issuer-config.tftpl.yaml", {
               aio_cluster_namespace              = var.aio_cluster_namespace
               aio_mq_broker_frontend_server_name = var.aio_mq_broker_frontend_server_name
+              aio_trust_secret_name              = var.aio_trust_secret_name
             }))
           }
         }
@@ -158,7 +159,7 @@ resource "azapi_resource" "aio_targets_opc_ua_broker" {
               templatefile("./manifests/opc-ua-broker-values.tftpl.yaml", {
                 aio_mq_auth_sat_audience     = var.aio_mq_auth_sat_audience
                 aio_mq_local_url             = local.aio_mq_local_url
-                aio_ca_cm_name               = var.aio_ca_cm_name
+                aio_trust_config_map_name    = var.aio_trust_config_map_name
                 aio_ca_cm_cert_name          = var.aio_ca_cm_cert_name
                 should_simulate_plc          = var.should_simulate_plc
                 aio_otel_collector_address   = local.aio_otel_collector_address

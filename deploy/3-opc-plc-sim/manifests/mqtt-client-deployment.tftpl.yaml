@@ -37,4 +37,4 @@ spec:
                   expirationSeconds: 86400
         - name: trust-bundle
           configMap:
-            name: ${aio_ca_cm_name}
+            name: ${aio_trust_config_map_name}

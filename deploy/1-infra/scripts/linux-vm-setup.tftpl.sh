@@ -152,7 +152,7 @@ ${aio_default_spc}
 EOF
 
 # Apply the ConfigMap that contains just the ca.crt (the tls.crt from above).
-kubectl create cm aio-ca-trust-bundle \
+kubectl create cm ${aio_trust_config_map_name} \
   --from-literal=ca.crt='${aio_ca_cert_pem}' \
   --namespace ${aio_cluster_namespace} \
   --dry-run=client -o yaml | kubectl apply -f -

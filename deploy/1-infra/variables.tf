@@ -16,7 +16,7 @@ variable "location" {
 variable "aio_cluster_namespace" {
   description = "The namespace in the cluster where AIO resources will be deployed."
   type        = string
-  default     = "aio"
+  default     = "azure-iot-operations"
 }
 
 variable "aio_placeholder_secret_value" {
@@ -171,17 +171,17 @@ variable "aio_akv_sp_client_secret" {
   nullable    = true
 }
 
-variable "aio_ca_secret_name" {
-  description = "(Optional) The name of the Kubernetes TLS secret that has the CA cert and key. (Otherwise, 'secret-tls')"
+variable "aio_trust_secret_name" {
+  description = "(Optional) The name of the Kubernetes TLS secret that has the CA cert and key. (Otherwise, 'aio-ca-key-pair-test-only')"
   type        = string
-  default     = "secret-tls"
+  default     = "aio-ca-key-pair-test-only"
   nullable    = false
 }
 
 variable "aio_akv_sp_secret_name" {
-  description = "(Optional) The name of the Secret that stores the Service Principal Client ID and Client Secret for the Azure Key Vault Secret Provider Extension. (Otherwise, 'aio-secrets-store-creds')"
+  description = "(Optional) The name of the Secret that stores the Service Principal Client ID and Client Secret for the Azure Key Vault Secret Provider Extension. (Otherwise, 'aio-akv-sp')"
   type        = string
-  default     = "aio-secrets-store-creds"
+  default     = "aio-akv-sp"
   nullable    = false
 }
 
@@ -189,6 +189,13 @@ variable "aio_spc_name" {
   description = "(Optional) The name of the SecretProviderClass Kubernetes object that's required by AIO. (Otherwise, 'aio-default-spc')"
   type        = string
   default     = "aio-default-spc"
+  nullable    = false
+}
+
+variable "aio_trust_config_map_name" {
+  description = "(Optional) The name of the ConfigMap for CA. (Otherwise, 'aio-ca-trust-bundle-test-only')"
+  type        = string
+  default     = "aio-ca-trust-bundle-test-only"
   nullable    = false
 }
 

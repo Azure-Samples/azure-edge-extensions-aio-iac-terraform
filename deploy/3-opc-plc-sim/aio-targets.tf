@@ -86,8 +86,8 @@ resource "azapi_resource" "aio_targets_mqtt_client" {
           type = "yaml.k8s"
           properties = {
             resource = yamldecode(templatefile("./manifests/mqtt-client-deployment.tftpl.yaml", {
-              aio_mq_auth_sat_audience = var.aio_mq_auth_sat_audience
-              aio_ca_cm_name           = var.aio_ca_cm_name
+              aio_mq_auth_sat_audience  = var.aio_mq_auth_sat_audience
+              aio_trust_config_map_name = var.aio_trust_config_map_name
             }))
           }
         },

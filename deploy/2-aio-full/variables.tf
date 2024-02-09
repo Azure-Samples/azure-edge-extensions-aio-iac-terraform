@@ -52,7 +52,7 @@ variable "aio_extension_release_train" {
 variable "aio_cluster_namespace" {
   description = "The namespace in the Arc Cluster where AIO resources will be installed."
   type        = string
-  default     = "aio"
+  default     = "azure-iot-operations"
 }
 
 variable "aio_spc_name" {
@@ -65,22 +65,22 @@ variable "aio_spc_name" {
 variable "aio_csi_secret_name" {
   description = "The name of the Secret for the CSI driver."
   type        = string
-  default     = "aio-secrets-store-creds"
+  default     = "aio-akv-sp"
 }
 
-variable "aio_ca_secret_name" {
+variable "aio_trust_secret_name" {
   description = "The name of the Kubernetes TLS secret that has the CA cert and key."
   type        = string
-  default     = "secret-tls"
+  default     = "aio-ca-key-pair-test-only"
 }
 
-variable "aio_ca_cm_name" {
+variable "aio_trust_config_map_name" {
   description = "The name of the Kubernetes ConfigMap that has the CA cert."
   type        = string
-  default     = "aio-ca-trust-bundle"
+  default     = "aio-ca-trust-bundle-test-only"
 }
 
-variable "aio_ca_issuer_name" {
+variable "aio_trust_issuer_name" {
   description = "The name of the CA Issuer used by AIO."
   type        = string
   default     = "aio-ca-issuer"
