@@ -20,14 +20,14 @@ resource "azapi_resource" "aio_targets_opc_plc_sim" {
           name = "opc-plc-sim-cm"
           type = "yaml.k8s"
           properties = {
-            resource = yamldecode(file("./manifests/opc-plc-server/opcplc_configMap.yaml"))
+            resource = yamldecode(file("${path.module}/manifests/opc-plc-server/opcplc_configMap.yaml"))
           }
         },
         {
           name = "opc-plc-sim-deployment"
           type = "yaml.k8s"
           properties = {
-            resource = yamldecode(templatefile("./manifests/opc-plc-server/opcplc_deployment.tftpl.yaml", {
+            resource = yamldecode(templatefile("${path.module}/manifests/opc-plc-server/opcplc_deployment.tftpl.yaml", {
               opc_plc_sim_server_name   = var.opc_plc_sim_server_name
               opc_plc_sim_image_version = var.opc_plc_sim_image_version
               aio_cluster_namespace     = var.aio_cluster_namespace
@@ -39,7 +39,7 @@ resource "azapi_resource" "aio_targets_opc_plc_sim" {
           name = "opc-plc-sim-service"
           type = "yaml.k8s"
           properties = {
-            resource = yamldecode(templatefile("./manifests/opc-plc-server/opcplc_service.tftpl.yaml", {
+            resource = yamldecode(templatefile("${path.module}/manifests/opc-plc-server/opcplc_service.tftpl.yaml", {
               opc_plc_sim_server_name = var.opc_plc_sim_server_name
             }))
           }
@@ -85,7 +85,7 @@ resource "azapi_resource" "aio_targets_mqtt_client" {
           name = "mqtt-client"
           type = "yaml.k8s"
           properties = {
-            resource = yamldecode(templatefile("./manifests/mqtt-client-deployment.tftpl.yaml", {
+            resource = yamldecode(templatefile("${path.module}/manifests/mqtt-client-deployment.tftpl.yaml", {
               aio_mq_auth_sat_audience  = var.aio_mq_auth_sat_audience
               aio_trust_config_map_name = var.aio_trust_config_map_name
             }))

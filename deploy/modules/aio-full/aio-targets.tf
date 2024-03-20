@@ -27,7 +27,7 @@ resource "azapi_resource" "aio_targets_main" {
               "repo"    = "mcr.microsoft.com/azureiotoperations/helm/aio-opentelemetry-collector"
               "version" = var.aio_observability_version
             }
-            values = yamldecode(file("./manifests/aio-otel-collector-values.yaml"))
+            values = yamldecode(file("${path.module}/manifests/aio-otel-collector-values.yaml"))
           }
         }
       ]
@@ -84,7 +84,7 @@ resource "azapi_resource" "aio_targets_mq" {
           name = "aio-mq-fe-issuer-config"
           type = "yaml.k8s"
           properties = {
-            resource = yamldecode(templatefile("./manifests/aio-mq-fe-issuer-config.tftpl.yaml", {
+            resource = yamldecode(templatefile("${path.module}/manifests/aio-mq-fe-issuer-config.tftpl.yaml", {
               aio_cluster_namespace              = var.aio_cluster_namespace
               aio_mq_broker_frontend_server_name = var.aio_mq_broker_frontend_server_name
               aio_trust_secret_name              = var.aio_trust_secret_name
@@ -141,7 +141,7 @@ resource "azapi_resource" "aio_targets_opc_ua_broker" {
           properties = {
             resource = yamldecode(
               templatefile(
-                "./manifests/aio-opc-asset-discovery.tftpl.yaml", {
+                "${path.module}/manifests/aio-opc-asset-discovery.tftpl.yaml", {
                   aio_extension_version = var.aio_opc_ua_broker_extension_version
                 }
             ))
@@ -156,7 +156,7 @@ resource "azapi_resource" "aio_targets_opc_ua_broker" {
               version = var.aio_opc_ua_broker_extension_version
             }
             values = yamldecode(
-              templatefile("./manifests/opc-ua-broker-values.tftpl.yaml", {
+              templatefile("${path.module}/manifests/opc-ua-broker-values.tftpl.yaml", {
                 aio_mq_auth_sat_audience     = var.aio_mq_auth_sat_audience
                 aio_mq_local_url             = local.aio_mq_local_url
                 aio_trust_config_map_name    = var.aio_trust_config_map_name
