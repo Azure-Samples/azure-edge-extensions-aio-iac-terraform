@@ -1,6 +1,6 @@
 # Azure Edge Extensions AIO IaC Terraform
 
-Infrastructure as Code (IaC) Terraform to install all Azure IoT Operations (AIO) components. Provides an optional infrastructure deployment that configures a Kubernetes cluster connected to Azure Arc. Each AIO component deployment is split out into separate Terraform deployment directories to make deploying a particular component (or all) of AIO easy, quick, and straightforward.
+Infrastructure as Code (IaC) Terraform to install all Azure IoT Operations (AIO) components. Provides an optional infrastructure deployment that configures a Kubernetes cluster connected to Azure Arc. Includes Terraform module for deploying each part; Infra, Azure IoT Operations, and/or OPC PLC Simulator easy and reusable.
 
 ## Features
 
@@ -9,12 +9,13 @@ This project utilizes Terraform to do the following:
 * (Optional) Provision an appropriately sized VM in Azure for Kubernetes and AIO.
 * (Optional) Provision necessary service principals for onboarding Arc and Azure Key Vault Secrets Provider access in the cluster.
 * (Optional) Creates self-signed certificates used within AIO.
-* Install Azure IoT Orchistrator into the cluster.
+* Install Azure IoT Orchestrator into the cluster.
 * Install Azure IoT MQ into the cluster.
 * Install Azure IoT Data Processor into the cluster.
 * Install Azure IoT Akri agent into the cluster.
 * Install Azure IoT OPC UA Broker into the cluster.
 * Install Azure IoT Layered Network Management into the cluster.
+* Install IoT OPC PLC Simulator managed through Terraform.
 
 ## Getting Started
 
@@ -28,7 +29,9 @@ This project utilizes Terraform to do the following:
 
 ### Providers Registered
 
-[1-infra](deploy/1-infra) will attempt to register all of the necessary Azure providers but if you are running this deployment on a Windows machine you may still need to manually register the providers due to limitations with Terraform's `local-exec`.
+[deploy/modules/infra/register-providers.tf](deploy/modules/infra/register-providers.tf) will attempt to register all of the necessary Azure providers but if you are running this deployment on a Windows machine you may still need to manually register the providers due to limitations with Terraform's `local-exec`.
+
+This can be achieved by running the following Azure CLI commands from the command line (after `az login`):
 
 ```shell
 az provider register -n "Microsoft.ExtendedLocation"
@@ -65,35 +68,26 @@ az provider show -n "Microsoft.DeviceRegistry" --query "registrationState"
      ```shell
      az account set -s <subscription-id>
      ```
-3. Add a `root-<unique-name>.tfvars` file to the root of the [deploy](deploy) directory that contains the following (refer to [deploy/sample-aio.general.tfvars.example](deploy/sample-aio.general.tfvars.example) for an example):
+3. Add a `<unique-name>.auto.tfvars` file to the root of the [deploy](deploy) directory that contains the following (refer to [deploy/sample-aio.auto.tfvars.example](deploy/sample-aio.auto.tfvars.example) for an example):
     ```hcl
-    // <project-root>/deploy/root-<unique-name>.tfvars
+    // <project-root>/deploy/<unique-name>.auto.tfvars
 
-    name = "<unique-name>"
+    name     = "<unique-name>"
     location = "<location>"
-    ```
-4. Add a `<unique-name>.auto.tfvars` to the [deploy/1-infra](deploy/1-infra) directory that contains the following required variables (refer to the [deploy/1-infra/sample-aio.auto.tfvars.example](deploy/1-infra/sample-aio.auto.tfvars.example) for an example):
-    ```hcl
-    // <project-root>/deploy/1-infra/<unique-name>.auto.tfvars
 
-    vm_computer_name             = "<computer-name>"
-    vm_username                  = "<computer-username>"
-    vm_ssh_pub_key_file          = "~/.ssh/id_aio_rsa.pub"
+    vm_computer_name             = "<unique-computer-name>"
+    vm_username                  = "<unique-vm-username>"
+    vm_ssh_pub_key_file          = "~/.ssh/<ssh-key-name>.pub"
     ```
-5. From the [deploy/1-infra](deploy/1-infra) directory execute the following (the `<unique-name>.auto.tfvars` created earlier will automatically be applied):
+4. From the [deploy](deploy) directory execute the following (the `<unique-name>.auto.tfvars` created earlier will automatically be applied):
    ```shell
    terraform init
-   terraform apply -var-file="../root-<unique-name>.tfvars"
-   ```
-6. Repeat the same `terraform` commands for the [deploy/2-aio-full](deploy/2-aio-full) directory:
-   ```shell
-   terraform init
-   terraform apply -var-file="../root-<unique-name>.tfvars"
+   terraform apply
    ```
    
 ## Deploying into an Existing Arc Connected Cluster
 
-> NOTE: Follow these instructions if you want to skip `1-infra` and are only wanting to use `2-aio-full` and/or `3-opc-plc-sim`.
+> NOTE: Follow these instructions if you want to skip deploying `infra` and are only wanting to use `aio-full` and/or `opc-plc-sim`.
 
 It is possible to use this repository to deploy Azure IoT Operations to an existing Azure Arc enabled cluster in an existing Resource Group. Ensure your cluster is setup and configured with the following prerequisites before deploying Azure IoT Operations.
 
@@ -129,19 +123,43 @@ It is possible to use this repository to deploy Azure IoT Operations to an exist
   az k8s-extension create -g <resource-group-name> -c <arc-cluster-name> -n "aks-secrets-provider" -t "connectedClusters" --extension-type "Microsoft.AzureKeyVaultSecretsProvider"
   ```
   
-Refer to [deploy/1-infra/scripts](./deploy/1-infra/scripts) and [deploy/1-infra/manifests](./deploy/1-infra/manifests) for additional required Kubernetes objects that must be present in the cluster before Azure IoT Operations can be installed.
+Refer to [deploy/modules/infra/scripts](./deploy/modules/infra/scripts) and [deploy/modules/infra/manifests](./deploy/modules/infra/manifests) for additional required Kubernetes objects that must be present in the cluster before Azure IoT Operations can be installed.
 
 ### Steps
 
 1. Refer to the [Quickstart](#quickstart) for instructions on setting up the root `.tfvars` file.
-2. Add a `<unique-name>.auto.tfvars` to [2-aio](./deploy/2-aio-full) directory that contains the following:
+2. Update the new `<unique-name>.auto.tfvars` with the following (unless defaults were used):
    1. The `resource_group_name` unless different from `rg-<name>`.
    2. The `arc_cluster_name` unless different from `arc-<name>`.
    3. The `key_vault_name` unless different from `kv-<name>`.
-   4. Disable any AIO components that are not needed, as an example `enable_aio_layered_network = false`.
-   5. Any additional settings, such as the TLS secret or SecretProviderClass name, that is different than any of the defaults specified.
-3. Execute the `terraform` commands for the [deploy/2-aio-full](deploy/2-aio-full) directory:
+3. Execute the `terraform` commands the same way in the [deploy](deploy) directory:
    ```shell
    terraform init
-   terraform apply -var-file="../root-<unique-name>.tfvars"
+   terraform apply"
    ```
+
+## Using Terraform Modules
+
+It is possible to use the Terraform modules directly from this repository using the [module](https://developer.hashicorp.com/terraform/language/modules/syntax) primitive supported by HCL syntax.
+
+An example of deploying just `aio-full` using Terraform from another repo would look like the following:
+
+```hcl
+module "aio_full" {
+  source = "github.com/azure-samples/azure-edge-extensions-aio-iac-terraform//deploy/modules/aio-full"
+
+  name     = var.name
+  location = var.location
+}
+```
+
+If you would like to lock the module on a particular tag that's possible by adding a `?ref=<tag>` version to the end of the `source` field.
+
+```hcl
+module "aio_full_with_tag" {
+  source = "github.com/azure-samples/azure-edge-extensions-aio-iac-terraform//deploy/modules/aio-full?ref=0.1.4"
+
+  name     = var.name
+  location = var.location
+}
+```
