@@ -46,3 +46,39 @@ variable "vm_storage_account_type" {
   type        = string
   default     = "Standard_LRS"
 }
+
+variable "should_install_infra" {
+  description = "(Optional) Installs the example VM infrastructure and configures Kubernetes cluster work with Azure IoT Operations. (Otherwise, 'true')"
+  type        = bool
+  default     = true
+}
+
+variable "should_install_aio" {
+  description = "(Optional) Installs Azure IoT Operations into the configured Kubernetes cluster. (Otherwise, 'true')"
+  type        = bool
+  default     = true
+}
+
+variable "should_install_opc_plc_sim" {
+  description = "(Optional) Installs OPC PLC Simulator into Azure IoT Operations. (Otherwise, 'true')"
+  type        = bool
+  default     = true
+}
+
+variable "resource_group_name" {
+  description = "(Optional) The resource group name where the Azure Arc Cluster resource is located. (Otherwise, 'rg-<var.name>', only used when skipping infra install)"
+  type        = string
+  default     = null
+}
+
+variable "arc_cluster_name" {
+  description = "(Optional) the Arc Cluster resource name. (Otherwise, 'arc-<var.name>', only used when skipping infra install)"
+  type        = string
+  default     = null
+}
+
+variable "key_vault_name" {
+  description = "(Optional) the Azure Key Vault resource name. (Otherwise, 'kv-<var.name>', only used when skipping infra install)"
+  type        = string
+  default     = null
+}
