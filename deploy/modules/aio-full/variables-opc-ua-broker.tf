@@ -7,7 +7,7 @@ variable "enable_aio_opc_ua_broker" {
 variable "aio_opc_ua_broker_extension_version" {
   description = "The Azure IoT OPC UA Broker version to install into the cluster."
   type        = string
-  default     = "0.2.0-preview"
+  default     = "0.3.0-preview"
 }
 
 variable "aio_opc_ua_broker_extension_release_train" {

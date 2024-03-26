@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: aio-opc-asset-discovery
+  labels:
+    "app.kubernetes.io/part-of": aio
 spec:
   selector:
     matchLabels:
@@ -10,10 +12,11 @@ spec:
     metadata:
       labels:
         name: aio-opc-asset-discovery
+        "app.kubernetes.io/part-of": aio
     spec:
       containers:
       - name: aio-opc-asset-discovery
-        image: 'mcr.microsoft.com/azureiotoperations/opcuabroker/discovery-handler:${aio_extension_version}'
+        image: 'mcr.microsoft.com/azureiotoperations/opcuabroker/discovery-handler:${aio_extension_version}.4'
         imagePullPolicy: Always
         resources:
           requests:
@@ -26,12 +29,10 @@ spec:
         - name: discovery
           containerPort: 80
         env:
-        - name: POD_IP
-          valueFrom:
-            fieldRef:
-              fieldPath: status.podIP
         - name: DISCOVERY_HANDLERS_DIRECTORY
           value: /var/lib/akri
+        - name: AKRI_AGENT_REGISTRATION
+          value: 'true'
         volumeMounts:
         - name: discovery-handlers
           mountPath: /var/lib/akri

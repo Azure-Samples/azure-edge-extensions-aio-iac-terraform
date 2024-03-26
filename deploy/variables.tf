@@ -82,3 +82,13 @@ variable "key_vault_name" {
   type        = string
   default     = null
 }
+
+variable "kubernetes_distro" {
+  description = "(Optional) The Kubernetes distro to run AIO on. (Otherwise, 'k3s', the infra deploys k3s or AKS EE)"
+  type        = string
+  default     = "k3s"
+  validation {
+    condition     = contains(["k3s", "k8s", "microk8s"], var.kubernetes_distro)
+    error_message = "Currently only supports [k3s, k8s, microk8s] Kubernetes distros."
+  }
+}

@@ -6,7 +6,8 @@ resource "azapi_resource" "aio_targets_main" {
   parent_id                 = data.azurerm_resource_group.this.id
 
   depends_on = [
-    azapi_resource.aio_custom_locations_sync
+    azapi_resource.aio_custom_locations_sync,
+    azurerm_arc_kubernetes_cluster_extension.aio
   ]
 
   body = jsonencode({
@@ -122,7 +123,7 @@ resource "azapi_resource" "aio_targets_opc_ua_broker" {
   depends_on = [
     azapi_resource.aio_custom_locations_sync,
     azapi_resource.aio_targets_main,
-    azapi_resource.aio_targets_mq
+    azapi_resource.aio_targets_mq,
   ]
 
   body = jsonencode({
@@ -147,28 +148,6 @@ resource "azapi_resource" "aio_targets_opc_ua_broker" {
             ))
           }
         },
-        {
-          name = "opc-ua-broker"
-          type = "helm.v3"
-          properties = {
-            chart = {
-              repo    = "oci://mcr.microsoft.com/azureiotoperations/opcuabroker/helmchart/microsoft-iotoperations-opcuabroker"
-              version = var.aio_opc_ua_broker_extension_version
-            }
-            values = yamldecode(
-              templatefile("${path.module}/manifests/opc-ua-broker-values.tftpl.yaml", {
-                aio_mq_auth_sat_audience     = var.aio_mq_auth_sat_audience
-                aio_mq_local_url             = local.aio_mq_local_url
-                aio_trust_config_map_name    = var.aio_trust_config_map_name
-                aio_ca_cm_cert_name          = var.aio_ca_cm_cert_name
-                should_simulate_plc          = var.should_simulate_plc
-                aio_otel_collector_address   = local.aio_otel_collector_address
-                aio_geneva_collector_address = local.aio_geneva_collector_address
-                aio_csi_secret_name          = var.aio_csi_secret_name
-              })
-            )
-          }
-        }
       ]
 
       topologies = [{

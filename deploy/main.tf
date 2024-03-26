@@ -21,9 +21,10 @@ module "aio_full" {
   name     = var.name
   location = var.location
 
-  resource_group_name = var.should_install_infra ? null : var.resource_group_name
-  arc_cluster_name    = var.should_install_infra ? null : var.arc_cluster_name
-  key_vault_name      = var.should_install_infra ? null : var.key_vault_name
+  resource_group_name        = var.should_install_infra ? null : var.resource_group_name
+  arc_cluster_name           = var.should_install_infra ? null : var.arc_cluster_name
+  key_vault_name             = var.should_install_infra ? null : var.key_vault_name
+  aio_akri_kubernetes_distro = var.kubernetes_distro
 }
 
 module "opc_plc_sim" {
