@@ -1,3 +1,7 @@
+locals {
+  opc_plc_sim_target_address = "opc.tcp://${var.should_install_opc_plc_simulator ? var.opc_plc_sim_server_name : "opcplc-000000"}:50000"
+}
+
 resource "azapi_resource" "opc_sim_aep" {
   schema_validation_enabled = false
   type                      = "Microsoft.DeviceRegistry/assetEndpointProfiles@2023-11-01-preview"
@@ -16,7 +20,7 @@ resource "azapi_resource" "opc_sim_aep" {
       additionalConfiguration = templatefile("${path.module}/config/opc-sim-connector-additional-config.tftpl.json", {
         opc_sim_connector_name = var.opc_sim_endpoint_name
       })
-      targetAddress = "opc.tcp://${var.should_install_opc_plc_simulator ? var.opc_plc_sim_server_name : "opcplc-000000"}:50000"
+      targetAddress = local.opc_plc_sim_target_address
       transportAuthentication = {
         ownCertificates = []
       }

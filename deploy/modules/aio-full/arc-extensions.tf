@@ -162,6 +162,14 @@ resource "azurerm_arc_kubernetes_cluster_extension" "layered_networking" {
   configuration_settings = {}
 }
 
+locals {
+  opc_ua_broker_client_ca = {
+    "securityPki.applicationCert" = var.aio_opc_ua_client_ca_spc_name
+    "securityPki.subjectName"     = var.aio_opc_ua_client_ca_subject_name
+    "securityPki.applicationUri"  = var.aio_opc_ua_client_ca_application_uri
+  }
+}
+
 resource "azurerm_arc_kubernetes_cluster_extension" "opc_ua_broker" {
   count = var.enable_aio_opc_ua_broker ? 1 : 0
 
@@ -173,6 +181,8 @@ resource "azurerm_arc_kubernetes_cluster_extension" "opc_ua_broker" {
     azurerm_arc_kubernetes_cluster_extension.aio,
     azurerm_arc_kubernetes_cluster_extension.mq,
     azapi_resource.mq,
+    azapi_resource.aio_targets_opc_ua_broker_trust,
+    azapi_resource.aio_targets_opc_ua_client_ca,
   ]
 
   identity {
@@ -184,7 +194,7 @@ resource "azurerm_arc_kubernetes_cluster_extension" "opc_ua_broker" {
 
   release_namespace = var.aio_cluster_namespace
 
-  configuration_settings = {
+  configuration_settings = merge({
     "mqttBroker.authenticationMethod"                 = "serviceAccountToken"
     "mqttBroker.serviceAccountTokenAudience"          = var.aio_mq_auth_sat_audience  # "[variables('MQ_PROPERTIES').satAudience]",
     "mqttBroker.caCertConfigMapRef"                   = var.aio_trust_config_map_name # "[variables('AIO_TRUST_CONFIG_MAP')]",
@@ -210,5 +220,5 @@ resource "azurerm_arc_kubernetes_cluster_extension" "opc_ua_broker" {
     "secrets.kind"                         = "csi"                   # "[parameters('opcUaBrokerSecrets').kind]",
     "secrets.csiServicePrincipalSecretRef" = var.aio_csi_secret_name # "[parameters('opcUaBrokerSecrets').csiServicePrincipalSecretRef]",
     "secrets.csiDriver"                    = "secrets-store.csi.k8s.io"
-  }
+  }, var.aio_opc_ua_should_use_client_ca_spc ? local.opc_ua_broker_client_ca : {})
 }
