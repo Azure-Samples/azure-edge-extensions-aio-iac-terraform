@@ -34,7 +34,7 @@ variable "key_vault_name" {
 variable "aio_extension_version" {
   description = "The AIO Arc Extension version to install into the cluster."
   type        = string
-  default     = "0.3.0-preview"
+  default     = "0.4.0-preview"
 }
 
 variable "aio_observability_version" {

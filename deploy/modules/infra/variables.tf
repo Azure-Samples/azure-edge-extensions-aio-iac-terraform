@@ -120,6 +120,12 @@ variable "vm_size" {
   default     = "Standard_D4_v4"
 }
 
+variable "vm_storage_account_type" {
+  description = "(Optional) The OS Disk Storage Account Type."
+  type        = string
+  default     = "Standard_LRS"
+}
+
 variable "admin_object_id" {
   description = "(Optional) The Client ID that will have admin privileges to the new Kubernetes cluster and Azure Key Vault. (Otherwise, uses current logged in user)"
   type        = string

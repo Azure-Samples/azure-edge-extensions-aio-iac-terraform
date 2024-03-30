@@ -1,0 +1,6 @@
+name     = "sample-aio"
+location = "westus3"
+
+vm_computer_name             = "aio-smpl"
+vm_username                  = "your-username"
+vm_ssh_pub_key_file          = "~/.ssh/your-rsa-ssh-key.pub"

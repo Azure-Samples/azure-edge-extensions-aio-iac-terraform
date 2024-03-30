@@ -110,7 +110,7 @@ resource "azurerm_linux_virtual_machine" "this" {
 
   os_disk {
     caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS"
+    storage_account_type = var.vm_storage_account_type
   }
 
   source_image_reference {
@@ -168,15 +168,15 @@ locals {
     aio_cluster_namespace     = var.aio_cluster_namespace
     aio_kv_name               = azurerm_key_vault.aio_kv.name
     aio_akv_sp_secret_name    = var.aio_akv_sp_secret_name
-    aio_default_spc           = templatefile("./manifests/aio-default-spc.tftpl.yaml", local.aio_default_spc_params)
+    aio_default_spc           = templatefile("${path.module}/manifests/aio-default-spc.tftpl.yaml", local.aio_default_spc_params)
     aio_sp_client_id          = local.aio_sp_client_id
     aio_sp_client_secret      = local.aio_sp_client_secret
     aio_trust_config_map_name = var.aio_trust_config_map_name
     aio_ca_cert_pem           = tls_self_signed_cert.ca.cert_pem
-    aio_ca_cert_trust_secret  = templatefile("./manifests/aio-ca-cert-trust-secret.tftpl.yaml", local.aio_ca_cert_trust_secret_params)
+    aio_ca_cert_trust_secret  = templatefile("${path.module}/manifests/aio-ca-cert-trust-secret.tftpl.yaml", local.aio_ca_cert_trust_secret_params)
   }
 
-  linux_vm_setup = templatefile("./scripts/linux-vm-setup.tftpl.sh", local.linux_vm_setup_params)
+  linux_vm_setup = templatefile("${path.module}/scripts/linux-vm-setup.tftpl.sh", local.linux_vm_setup_params)
 }
 
 // Only use for debugging the linux-vm-setup.sh script.

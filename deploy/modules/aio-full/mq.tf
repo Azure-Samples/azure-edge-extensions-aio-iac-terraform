@@ -39,20 +39,20 @@ resource "azapi_resource" "mq_broker" {
       authImage = {
         pullPolicy = "Always"
         repository = "mcr.microsoft.com/azureiotoperations/dmqtt-authentication"
-        tag        = var.aio_mq_extension_version
+        tag        = "${var.aio_mq_extension_version}-rc3"
       }
       brokerImage = {
         pullPolicy = "Always"
         repository = "mcr.microsoft.com/azureiotoperations/dmqtt-pod"
-        tag        = var.aio_mq_extension_version
+        tag        = "${var.aio_mq_extension_version}-rc3"
       }
       healthManagerImage = {
         pullPolicy = "Always",
         repository = "mcr.microsoft.com/azureiotoperations/dmqtt-operator"
-        tag        = var.aio_mq_extension_version
+        tag        = "${var.aio_mq_extension_version}-rc3"
       }
       diagnostics = {
-        probeImage      = "mcr.microsoft.com/azureiotoperations/diagnostics-probe:${var.aio_mq_extension_version}"
+        probeImage      = "mcr.microsoft.com/azureiotoperations/diagnostics-probe:${var.aio_mq_extension_version}-rc3"
         enableSelfCheck = true
       }
       mode          = var.aio_mq_mode
@@ -89,7 +89,7 @@ resource "azapi_resource" "mq_diagnostics" {
     properties = {
       image = {
         repository = "mcr.microsoft.com/azureiotoperations/diagnostics-service"
-        tag        = var.aio_mq_extension_version
+        tag        = "${var.aio_mq_extension_version}-rc3"
       }
       logLevel  = var.aio_mq_diag_log_level
       logFormat = var.aio_mq_diag_log_format

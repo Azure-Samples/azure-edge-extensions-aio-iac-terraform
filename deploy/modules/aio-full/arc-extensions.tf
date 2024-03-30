@@ -103,9 +103,6 @@ resource "azurerm_arc_kubernetes_cluster_extension" "processor" {
     "Microsoft.CustomLocation.ServiceAccount" = "default"
     "otelCollectorAddress"                    = local.aio_otel_collector_address_no_protocol
     "genevaCollectorAddress"                  = local.aio_geneva_collector_address_no_protocol
-    "cardinality.readerWorker.replicas"       = var.aio_dataprocessor_reader_count
-    "cardinality.runnerWorker.replicas"       = var.aio_dataprocessor_runner_count
-    "nats.config.cluster.replicas"            = var.aio_dataprocessor_message_store_count
     "secrets.secretProviderClassName"         = var.aio_spc_name
     "secrets.servicePrincipalSecretRef"       = var.aio_csi_secret_name
     "caTrust.enabled"                         = "true"
@@ -135,7 +132,10 @@ resource "azurerm_arc_kubernetes_cluster_extension" "akri" {
   release_namespace = var.aio_cluster_namespace
 
   configuration_settings = {
-    "webhookConfiguration.enabled" = "false"
+    "webhookConfiguration.enabled"          = "true"
+    "certManagerWebhookCertificate.enabled" = "true"
+    "agent.host.containerRuntimeSocket"     = var.aio_akri_container_runtime_socket # "[parameters('containerRuntimeSocket')]",
+    "kubernetesDistro"                      = var.aio_akri_kubernetes_distro        # "[parameters('kubernetesDistro')]"
   }
 }
 
@@ -160,4 +160,65 @@ resource "azurerm_arc_kubernetes_cluster_extension" "layered_networking" {
   release_namespace = var.aio_cluster_namespace
 
   configuration_settings = {}
+}
+
+locals {
+  opc_ua_broker_client_ca = {
+    "securityPki.applicationCert" = var.aio_opc_ua_client_ca_spc_name
+    "securityPki.subjectName"     = var.aio_opc_ua_client_ca_subject_name
+    "securityPki.applicationUri"  = var.aio_opc_ua_client_ca_application_uri
+  }
+}
+
+resource "azurerm_arc_kubernetes_cluster_extension" "opc_ua_broker" {
+  count = var.enable_aio_opc_ua_broker ? 1 : 0
+
+  name           = "opc-ua-broker"
+  cluster_id     = local.cluster_id
+  extension_type = "microsoft.iotoperations.opcuabroker"
+
+  depends_on = [
+    azurerm_arc_kubernetes_cluster_extension.aio,
+    azurerm_arc_kubernetes_cluster_extension.mq,
+    azapi_resource.mq,
+    azapi_resource.aio_targets_opc_ua_broker_trust,
+    azapi_resource.aio_targets_opc_ua_client_ca,
+  ]
+
+  identity {
+    type = "SystemAssigned"
+  }
+
+  release_train = var.aio_opc_ua_broker_extension_release_train
+  version       = var.aio_opc_ua_broker_extension_version
+
+  release_namespace = var.aio_cluster_namespace
+
+  configuration_settings = merge({
+    "mqttBroker.authenticationMethod"                 = "serviceAccountToken"
+    "mqttBroker.serviceAccountTokenAudience"          = var.aio_mq_auth_sat_audience  # "[variables('MQ_PROPERTIES').satAudience]",
+    "mqttBroker.caCertConfigMapRef"                   = var.aio_trust_config_map_name # "[variables('AIO_TRUST_CONFIG_MAP')]",
+    "mqttBroker.caCertKey"                            = var.aio_ca_cm_cert_name       # "[variables('AIO_TRUST_CONFIG_MAP_KEY')]",
+    "mqttBroker.address"                              = local.aio_mq_local_url        # "[variables('MQ_PROPERTIES').localUrl]",
+    "mqttBroker.connectUserProperties.metriccategory" = "aio-opc"
+
+    "opcPlcSimulation.deploy" = var.should_simulate_plc # "[format('{0}', parameters('simulatePLC'))]"
+
+    "openTelemetry.enabled"                                = "true"
+    "openTelemetry.endpoints.default.uri"                  = local.aio_otel_collector_address # "[variables('OBSERVABILITY').otelCollectorAddress]",
+    "openTelemetry.endpoints.default.protocol"             = "grpc"
+    "openTelemetry.endpoints.default.emitLogs"             = "false"
+    "openTelemetry.endpoints.default.emitMetrics"          = "true"
+    "openTelemetry.endpoints.default.emitTraces"           = "false"
+    "openTelemetry.endpoints.geneva.uri"                   = local.aio_geneva_collector_address # "[variables('OBSERVABILITY').genevaCollectorAddress]",
+    "openTelemetry.endpoints.geneva.protocol"              = "grpc"
+    "openTelemetry.endpoints.geneva.emitLogs"              = "false"
+    "openTelemetry.endpoints.geneva.emitMetrics"           = "true"
+    "openTelemetry.endpoints.geneva.emitTraces"            = "false"
+    "openTelemetry.endpoints.geneva.temporalityPreference" = "delta"
+
+    "secrets.kind"                         = "csi"                   # "[parameters('opcUaBrokerSecrets').kind]",
+    "secrets.csiServicePrincipalSecretRef" = var.aio_csi_secret_name # "[parameters('opcUaBrokerSecrets').csiServicePrincipalSecretRef]",
+    "secrets.csiDriver"                    = "secrets-store.csi.k8s.io"
+  }, var.aio_opc_ua_should_use_client_ca_spc ? local.opc_ua_broker_client_ca : {})
 }

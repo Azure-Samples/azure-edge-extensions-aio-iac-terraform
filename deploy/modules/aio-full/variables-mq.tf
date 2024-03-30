@@ -7,7 +7,7 @@ variable "enable_aio_mq" {
 variable "aio_mq_extension_version" {
   description = "The Azure IoT MQ Arc Extension version to install into the cluster."
   type        = string
-  default     = "0.2.0-preview"
+  default     = "0.3.0-preview"
 }
 
 variable "aio_mq_extension_release_train" {
