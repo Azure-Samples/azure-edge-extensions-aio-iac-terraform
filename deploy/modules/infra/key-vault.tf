@@ -22,7 +22,7 @@ resource "azurerm_key_vault" "aio_kv" {
 }
 
 data "azurerm_key_vault" "aio_kv" {
-  count = var.should_create_azure_key_vault ? 1 : 0
+  count = var.should_create_azure_key_vault ? 0 : 1
 
   name                = local.azure_key_vault_name
   resource_group_name = local.resource_group_name
