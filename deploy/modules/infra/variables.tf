@@ -73,6 +73,19 @@ variable "should_allow_list_kubectl_port" {
   default     = false
 }
 
+variable "should_create_azure_key_vault" {
+  description = "Create and manage the Azure Key Vault or use an existing Azure Key Vault."
+  type        = bool
+  default     = true
+}
+
+variable "azure_key_vault_name" {
+  description = "(Optional) The name of the Azure Key Vault where secrets will be created. (Otherwise, 'kv-<var.name>')"
+  type        = string
+  default     = null
+  nullable    = true
+}
+
 variable "should_create_aio_onboard_sp" {
   description = "Creates a new Service Principal with 'Kubernetes Cluster - Azure Arc Onboarding' and 'Kubernetes Extension Contributor' roles for onboarding the new cluster to Arc."
   type        = bool

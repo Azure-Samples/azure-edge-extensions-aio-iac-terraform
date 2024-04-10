@@ -151,7 +151,7 @@ locals {
   aio_default_spc_params = {
     aio_spc_name          = var.aio_spc_name
     aio_cluster_namespace = var.aio_cluster_namespace
-    aio_kv_name           = azurerm_key_vault.aio_kv.name
+    aio_kv_name           = local.azure_key_vault_name
     aio_tenant_id         = data.azurerm_client_config.current.tenant_id
   }
   aio_ca_cert_trust_secret_params = {
@@ -177,7 +177,7 @@ locals {
     custom_locations_oid = data.azuread_service_principal.custom_locations_rp.object_id
 
     aio_cluster_namespace     = var.aio_cluster_namespace
-    aio_kv_name               = azurerm_key_vault.aio_kv.name
+    aio_kv_name               = local.azure_key_vault_name
     aio_akv_sp_secret_name    = var.aio_akv_sp_secret_name
     aio_default_spc           = templatefile("${path.module}/manifests/aio-default-spc.tftpl.yaml", local.aio_default_spc_params)
     aio_sp_client_id          = local.aio_sp_client_id

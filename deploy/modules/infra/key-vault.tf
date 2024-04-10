@@ -1,3 +1,8 @@
+locals {
+  azure_key_vault_name = coalesce(var.azure_key_vault_name, "kv-${var.name}")
+  azure_key_vault_id   = var.should_create_azure_key_vault ? azurerm_key_vault.aio_kv[0].id : data.azurerm_key_vault.aio_kv[0].id
+}
+
 ///
 // Create an Azure Key Vault which will be used by AIO.
 // - Creates the Azure Key Vault.
@@ -7,17 +12,26 @@
 ///
 
 resource "azurerm_key_vault" "aio_kv" {
-  name                = "kv-${var.name}"
+  count = var.should_create_azure_key_vault ? 1 : 0
+
+  name                = local.azure_key_vault_name
   location            = var.location
   resource_group_name = local.resource_group_name
   tenant_id           = data.azurerm_client_config.current.tenant_id
   sku_name            = "standard"
 }
 
+data "azurerm_key_vault" "aio_kv" {
+  count = var.should_create_azure_key_vault ? 1 : 0
+
+  name                = local.azure_key_vault_name
+  resource_group_name = local.resource_group_name
+}
+
 // Give the admin access to create and update keys/permissions/secrets.
 
 resource "azurerm_key_vault_access_policy" "aio_kv_admin_user" {
-  key_vault_id = azurerm_key_vault.aio_kv.id
+  key_vault_id = local.azure_key_vault_id
   object_id    = local.admin_object_id
   tenant_id    = data.azurerm_client_config.current.tenant_id
 
@@ -33,7 +47,7 @@ resource "azurerm_key_vault_access_policy" "aio_kv_admin_user" {
 
 resource "azurerm_key_vault_access_policy" "aio_kv_current_user" {
   count        = var.admin_object_id != null ? 1 : 0
-  key_vault_id = azurerm_key_vault.aio_kv.id
+  key_vault_id = local.azure_key_vault_id
   object_id    = data.azurerm_client_config.current.object_id
   tenant_id    = data.azurerm_client_config.current.tenant_id
 
@@ -54,7 +68,7 @@ locals {
 
 resource "azurerm_key_vault_secret" "aio_placeholder" {
   name         = "placeholder-secret"
-  key_vault_id = azurerm_key_vault.aio_kv.id
+  key_vault_id = local.azure_key_vault_id
   value        = local.aio_placeholder_secret
 
   depends_on = [
@@ -66,7 +80,7 @@ resource "azurerm_key_vault_secret" "aio_placeholder" {
 // Give the new service principal Azure Key Vault access policy permissions.
 
 resource "azurerm_key_vault_access_policy" "aio_sp" {
-  key_vault_id = azurerm_key_vault.aio_kv.id
+  key_vault_id = local.azure_key_vault_id
   object_id    = local.aio_sp_object_id
   tenant_id    = data.azurerm_client_config.current.tenant_id
 
@@ -77,7 +91,7 @@ resource "azurerm_key_vault_access_policy" "aio_sp" {
 }
 
 resource "azurerm_key_vault_access_policy" "aio_onboard_sp" {
-  key_vault_id = azurerm_key_vault.aio_kv.id
+  key_vault_id = local.azure_key_vault_id
   object_id    = local.aio_onboard_sp_object_id
   tenant_id    = data.azurerm_client_config.current.tenant_id
 
