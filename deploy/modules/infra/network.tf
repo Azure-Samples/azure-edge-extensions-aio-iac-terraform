@@ -22,21 +22,21 @@ data "http" "ip" {
 resource "azurerm_virtual_network" "this" {
   name                = "vnet-${var.name}"
   address_space       = [var.vnet_address_space]
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
+  location            = var.location
+  resource_group_name = local.resource_group_name
 }
 
 resource "azurerm_subnet" "this" {
   name                 = "subnet-${var.name}"
-  resource_group_name  = azurerm_resource_group.this.name
+  resource_group_name  = local.resource_group_name
   virtual_network_name = azurerm_virtual_network.this.name
   address_prefixes     = [var.subnet_address_space]
 }
 
 resource "azurerm_network_security_group" "this" {
   name                = "nsg-${var.name}"
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
+  location            = var.location
+  resource_group_name = local.resource_group_name
 }
 
 // Allows SSH into the VM.
@@ -46,7 +46,7 @@ resource "azurerm_network_security_rule" "allow_ssh" {
   name  = "AllowMyIpAddressToVNetTCP22"
 
   network_security_group_name = azurerm_network_security_group.this.name
-  resource_group_name         = azurerm_resource_group.this.name
+  resource_group_name         = local.resource_group_name
 
   priority                   = 1001
   description                = "WAN IP access to port 22"
@@ -66,7 +66,7 @@ resource "azurerm_network_security_rule" "allow_kubectl" {
   name  = "AllowMyIpAddressToVNetTCP6443"
 
   network_security_group_name = azurerm_network_security_group.this.name
-  resource_group_name         = azurerm_resource_group.this.name
+  resource_group_name         = local.resource_group_name
 
   priority                   = 1011
   description                = "WAN IP access to port 6443"

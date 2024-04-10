@@ -6,8 +6,11 @@
 ///
 
 locals {
+  resource_group_name = coalesce(var.resource_group_name, "rg-${var.name}")
+  resource_group_id   = var.should_create_resource_group ? azurerm_resource_group.this[0].id : data.azurerm_resource_group.this[0].id
+
   arc_resource_name = "arc-${var.name}"
-  arc_cluster_id    = "${azurerm_resource_group.this.id}/providers/Microsoft.Kubernetes/connectedClusters/${local.arc_resource_name}"
+  arc_cluster_id    = "${local.resource_group_id}/providers/Microsoft.Kubernetes/connectedClusters/${local.arc_resource_name}"
 
   admin_object_id = var.admin_object_id == null ? data.azurerm_client_config.current.object_id : var.admin_object_id
 
@@ -23,14 +26,22 @@ data "azurerm_client_config" "current" {
 }
 
 resource "azurerm_resource_group" "this" {
-  name     = "rg-${var.name}"
+  count = var.should_create_resource_group ? 1 : 0
+
+  name     = local.resource_group_name
   location = var.location
+}
+
+data "azurerm_resource_group" "this" {
+  count = var.should_create_resource_group ? 0 : 1
+
+  name = local.resource_group_name
 }
 
 resource "azurerm_public_ip" "this" {
   name                = "ip-${var.name}"
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
+  location            = var.location
+  resource_group_name = local.resource_group_name
   allocation_method   = "Static"
   sku                 = "Standard"
   zones               = ["1"]
@@ -38,8 +49,8 @@ resource "azurerm_public_ip" "this" {
 
 resource "azurerm_network_interface" "this" {
   name                = "nic-${var.name}"
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
+  location            = var.location
+  resource_group_name = local.resource_group_name
 
   ip_configuration {
     name                          = "internal"
@@ -61,8 +72,8 @@ resource "azurerm_windows_virtual_machine" "this" {
   count = var.should_use_linux ? 0 : 1
 
   name                                                   = "vm-${var.name}"
-  resource_group_name                                    = azurerm_resource_group.this.name
-  location                                               = azurerm_resource_group.this.location
+  resource_group_name                                    = local.resource_group_name
+  location                                               = var.location
   size                                                   = "Standard_D4_v5"
   computer_name                                          = var.vm_computer_name
   admin_username                                         = var.vm_username
@@ -92,8 +103,8 @@ resource "azurerm_linux_virtual_machine" "this" {
   count = var.should_use_linux ? 1 : 0
 
   name                  = "vm-${var.name}"
-  resource_group_name   = azurerm_resource_group.this.name
-  location              = azurerm_resource_group.this.location
+  resource_group_name   = local.resource_group_name
+  location              = var.location
   size                  = var.vm_size
   computer_name         = var.vm_computer_name
   admin_username        = var.vm_username
@@ -155,7 +166,7 @@ locals {
     location          = var.location
     cluster_admin_oid = local.admin_object_id
 
-    resource_group_name = azurerm_resource_group.this.name
+    resource_group_name = local.resource_group_name
 
     arc_resource_name            = local.arc_resource_name
     aio_onboard_sp_client_id     = local.aio_onboard_sp_client_id

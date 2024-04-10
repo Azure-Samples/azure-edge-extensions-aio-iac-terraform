@@ -9,7 +9,7 @@
 resource "azurerm_key_vault" "aio_kv" {
   name                = "kv-${var.name}"
   location            = var.location
-  resource_group_name = azurerm_resource_group.this.name
+  resource_group_name = local.resource_group_name
   tenant_id           = data.azurerm_client_config.current.tenant_id
   sku_name            = "standard"
 }
