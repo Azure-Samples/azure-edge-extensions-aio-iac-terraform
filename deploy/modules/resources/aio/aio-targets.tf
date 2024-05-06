@@ -147,34 +147,6 @@ resource "azapi_resource" "aio_targets_opc_ua_broker" {
                 }
             ))
           }
-        },
-        {
-          name = "aio-opc-ua-broker-issuer-list"
-          type = "yaml.k8s"
-          properties = {
-            resource = yamldecode(
-              templatefile(
-                "${path.module}/manifests/aio-opc-ua-broker-issuer-list.yaml", {
-                  aio_cluster_namespace = var.aio_cluster_namespace,
-                  aio_keyvault_name     = module.key_vault.keyvault_name,
-                  aio_tenant_id         = data.azurerm_client_config.current.tenant_id,
-                }
-            ))
-          }
-        },
-        {
-          name = "aio-opc-ua-broker-trust-list"
-          type = "yaml.k8s"
-          properties = {
-            resource = yamldecode(
-              templatefile(
-                "${path.module}/manifests/aio-opc-ua-broker-trust-list.yaml", {
-                  aio_cluster_namespace = var.aio_cluster_namespace,
-                  aio_keyvault_name     = module.key_vault.keyvault_name,
-                  aio_tenant_id         = data.azurerm_client_config.current.tenant_id,
-                }
-            ))
-          }
         }
       ]
       topologies = [{

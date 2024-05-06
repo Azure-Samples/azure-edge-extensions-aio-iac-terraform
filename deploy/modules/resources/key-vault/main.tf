@@ -1,6 +1,7 @@
 locals {
-  key_vault_name = "kv-${var.name}"
-  key_vault_id   = var.should_create_key_vault ? azurerm_key_vault.kv[0].id : data.azurerm_key_vault.kv[0].id
+  key_vault_name      = "kv-${var.name}"
+  key_vault_id        = var.should_create_key_vault ? azurerm_key_vault.kv[0].id : data.azurerm_key_vault.kv[0].id
+  key_vault_tenant_id = var.should_create_key_vault ? azurerm_key_vault.kv[0].tenant_id : data.azurerm_key_vault.kv[0].tenant_id
 }
 
 data "azurerm_client_config" "current" {

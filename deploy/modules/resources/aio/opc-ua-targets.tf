@@ -93,7 +93,7 @@ resource "azapi_resource" "aio_targets_opc_ua_broker_trust" {
   type                      = "Microsoft.IoTOperationsOrchestrator/targets@2023-10-04-preview"
   name                      = "${var.name}-tgt-oub-trust"
   location                  = var.location
-  parent_id                 = data.azurerm_resource_group.this.id
+  parent_id                 = module.resource_group.resource_group_id
 
   depends_on = [
     azapi_resource.aio_custom_locations_sync,
@@ -121,10 +121,11 @@ resource "azapi_resource" "aio_targets_opc_ua_broker_trust" {
             resource = yamldecode(
               templatefile(
                 "${path.module}/manifests/opc-ua-broker-certs-spc.yaml", {
-                  spc_name      = "aio-opc-ua-broker-trust-list"
-                  aio_kv_name   = data.azurerm_key_vault.aio_kv.name
-                  aio_tenant_id = data.azurerm_key_vault.aio_kv.tenant_id
-                  spc_obj_certs = local.opc_ua_trust_ca_spc_obj
+                  spc_name              = "aio-opc-ua-broker-trust-list"
+                  aio_cluster_namespace = var.aio_cluster_namespace
+                  aio_kv_name           = module.key_vault.keyvault_name
+                  aio_tenant_id         = module.key_vault.keyvault_tenant_id
+                  spc_obj_certs         = local.opc_ua_trust_ca_spc_obj
                 }
             ))
           }
@@ -136,10 +137,11 @@ resource "azapi_resource" "aio_targets_opc_ua_broker_trust" {
             resource = yamldecode(
               templatefile(
                 "${path.module}/manifests/opc-ua-broker-certs-spc.yaml", {
-                  spc_name      = "aio-opc-ua-broker-issuer-list"
-                  aio_kv_name   = data.azurerm_key_vault.aio_kv.name
-                  aio_tenant_id = data.azurerm_key_vault.aio_kv.tenant_id
-                  spc_obj_certs = local.opc_ua_issuer_ca_spc_obj
+                  spc_name              = "aio-opc-ua-broker-issuer-list"
+                  aio_cluster_namespace = var.aio_cluster_namespace
+                  aio_kv_name           = module.key_vault.keyvault_name
+                  aio_tenant_id         = module.key_vault.keyvault_tenant_id
+                  spc_obj_certs         = local.opc_ua_issuer_ca_spc_obj
                 }
             ))
           }
@@ -168,7 +170,7 @@ resource "azapi_resource" "aio_targets_opc_ua_client_ca" {
   type                      = "Microsoft.IoTOperationsOrchestrator/targets@2023-10-04-preview"
   name                      = "${var.name}-tgt-oub-cert"
   location                  = var.location
-  parent_id                 = data.azurerm_resource_group.this.id
+  parent_id                 = module.resource_group.resource_group_id
 
   depends_on = [
     azapi_resource.aio_custom_locations_sync,
@@ -196,10 +198,11 @@ resource "azapi_resource" "aio_targets_opc_ua_client_ca" {
             resource = yamldecode(
               templatefile(
                 "${path.module}/manifests/opc-ua-broker-certs-spc.yaml", {
-                  spc_name      = "aio-opc-ua-broker-client-certificate"
-                  aio_kv_name   = data.azurerm_key_vault.aio_kv.name
-                  aio_tenant_id = data.azurerm_key_vault.aio_kv.tenant_id
-                  spc_obj_certs = local.opc_ua_client_ca_spc_obj
+                  spc_name              = "aio-opc-ua-broker-client-certificate"
+                  aio_cluster_namespace = var.aio_cluster_namespace
+                  aio_kv_name           = module.key_vault.keyvault_name
+                  aio_tenant_id         = module.key_vault.keyvault_tenant_id
+                  spc_obj_certs         = local.opc_ua_client_ca_spc_obj
                 }
             ))
           }

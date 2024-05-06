@@ -24,7 +24,7 @@ variable "is_linux_server" {
   type        = bool
 }
 
-variable "should_create_storage_account"{ 
+variable "should_create_storage_account" {
   description = "Creates a new Storage Account"
   type        = bool
   default     = false
@@ -104,4 +104,17 @@ variable "kubernetes_distro" {
     condition     = contains(["k3s", "k8s", "microk8s"], var.kubernetes_distro)
     error_message = "Currently only supports [k3s, k8s, microk8s] Kubernetes distros."
   }
+}
+
+variable "aio_mq_broker_auth_non_tls_enabled" {
+  description = "(Optional) Enable non-TLS authentication for the MQTT broker."
+  type        = bool
+  default     = false
+}
+
+variable "should_deploy_mqtt_client" {
+  description = "(Optional) Deploy the MQTT client to the Kubernetes cluster."
+  type        = bool
+  default     = false
+  
 }

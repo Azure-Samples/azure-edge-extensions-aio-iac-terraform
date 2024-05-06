@@ -1,3 +1,7 @@
+output "aio_cluster_name" {
+  value = local.aio_cluster_name
+}
+
 output "aio_cluster_namespace" {
   value = var.aio_cluster_namespace
 }
@@ -10,7 +14,7 @@ output "aio_targets_main_version" {
   value = var.aio_targets_main_version
 }
 
-output "aio_custom_locations_id"{
+output "aio_custom_locations_id" {
   value = azapi_resource.aio_custom_locations.id
 }
 

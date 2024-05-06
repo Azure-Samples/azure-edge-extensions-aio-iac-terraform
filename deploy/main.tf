@@ -25,7 +25,9 @@ module "aio_full" {
   name     = var.name
   location = var.location
 
-  kubernetes_distro = var.kubernetes_distro
+  kubernetes_distro                  = var.kubernetes_distro
+  aio_mq_broker_auth_non_tls_enabled = var.aio_mq_broker_auth_non_tls_enabled
+  should_deploy_mqtt_client          = var.should_deploy_mqtt_client
 
   should_use_event_hub  = var.should_use_event_hub
   should_use_event_grid = var.should_use_event_grid
@@ -39,7 +41,7 @@ module "opc_plc_sim" {
 
   name             = var.name
   location         = var.location
-  arc_cluster_name = var.arc_cluster_name
+  arc_cluster_name = module.aio_full[0].aio_cluster_name
 }
 
 output "resource_group_name" {
