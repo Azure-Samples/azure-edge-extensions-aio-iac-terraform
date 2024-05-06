@@ -1,22 +1,47 @@
 locals {
-  resource_group_id = data.azurerm_resource_group.this.id
-  cluster_id        = var.arc_cluster_name != null ? "${local.resource_group_id}/providers/Microsoft.Kubernetes/connectedClusters/${var.arc_cluster_name}" : "${local.resource_group_id}/providers/Microsoft.Kubernetes/connectedClusters/arc-${var.name}"
-
-  aio_otel_collector_address_no_protocol   = "aio-otel-collector.${var.aio_cluster_namespace}.svc.cluster.local:4317"
-  aio_geneva_collector_address_no_protocol = "geneva-metrics-service.${var.aio_cluster_namespace}.svc.cluster.local:4317"
-
-  aio_otel_collector_address   = "http://${local.aio_otel_collector_address_no_protocol}"
-  aio_geneva_collector_address = "http://${local.aio_geneva_collector_address_no_protocol}"
-
-  aio_mq_domain    = "${var.aio_mq_frontend_server}.${var.aio_cluster_namespace}"
-  aio_mq_local_url = "mqtts://${local.aio_mq_domain}:8883"
+  resource_name = "${var.name}-${var.location}"
 }
 
-data "azurerm_resource_group" "this" {
-  name = var.resource_group_name != null ? var.resource_group_name : "rg-${var.name}"
+data "azurerm_client_config" "current" {
 }
 
-data "azurerm_key_vault" "aio_kv" {
-  name                = var.key_vault_name != null ? var.key_vault_name : "kv-${var.name}"
-  resource_group_name = data.azurerm_resource_group.this.name
+module "azure_iot_operations" {
+  source = "../resources/aio"
+
+  name                               = var.name
+  location                           = var.location
+  aio_mq_broker_auth_non_tls_enabled = var.aio_mq_broker_auth_non_tls_enabled
+  aio_akri_kubernetes_distro         = var.kubernetes_distro
+}
+
+module "event_hub" {
+  source = "../resources/event-hub"
+
+  count                             = var.should_use_event_hub ? 1 : 0
+  should_create_event_hub_namespace = false
+
+  name                = local.resource_name
+  resource_group_name = module.azure_iot_operations.resource_group_name
+  location            = module.azure_iot_operations.resource_group_location
+
+  should_create_event_hub = true
+  eventhub_names          = var.aio_eh_names
+  message_retention       = var.event_hub_message_retention
+  partition_count         = var.event_hub_partition_count
+}
+
+module "event_grid" {
+  source = "../resources/event-grid"
+  count  = var.should_use_event_grid ? 1 : 0
+
+  should_create_eventgrid_namespace = false
+  name                              = local.resource_name
+  location                          = module.azure_iot_operations.resource_group_location
+  resource_group_id                 = module.azure_iot_operations.resource_group_id
+
+  should_create_event_grid_topics             = true
+  eventgrid_topic_space_name                  = var.aio_eg_topic_space_name
+  eventgrid_topic_templates                   = var.aio_eg_topic_templates
+  eventgrid_permission_binder_subscriber_name = var.aio_eg_permission_binder_subscriber_name
+  eventgrid_permission_binder_publisher_name  = var.aio_eg_permission_binder_publisher_name
 }

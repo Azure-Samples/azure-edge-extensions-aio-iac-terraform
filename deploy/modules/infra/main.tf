@@ -6,152 +6,25 @@
 ///
 
 locals {
-  resource_group_name = coalesce(var.resource_group_name, "rg-${var.name}")
-  resource_group_id   = var.should_create_resource_group ? azurerm_resource_group.this[0].id : data.azurerm_resource_group.this[0].id
-
-  arc_resource_name = "arc-${var.name}"
-  arc_cluster_id    = "${local.resource_group_id}/providers/Microsoft.Kubernetes/connectedClusters/${local.arc_resource_name}"
+  resource_name           = "${var.name}-${var.location}"
+  resource_name_condensed = "${var.name}${var.location}"
+  arc_resource_name       = "arc-${local.resource_name}"
+  arc_cluster_id          = "${module.resource_group.resource_group_id}/providers/Microsoft.Kubernetes/connectedClusters/${local.arc_resource_name}"
+  create_virtual_machine  = var.should_create_virtual_machine && var.is_linux_server
 
   admin_object_id = var.admin_object_id == null ? data.azurerm_client_config.current.object_id : var.admin_object_id
 
-  aio_onboard_sp_object_id     = var.should_create_aio_onboard_sp ? azuread_service_principal.aio_onboard_sp[0].object_id : var.aio_onboard_sp_object_id
-  aio_onboard_sp_client_id     = var.should_create_aio_onboard_sp ? azuread_service_principal.aio_onboard_sp[0].client_id : var.aio_onboard_sp_client_id
-  aio_onboard_sp_client_secret = var.should_create_aio_onboard_sp ? azuread_application_password.aio_onboard_sp[0].value : var.aio_onboard_sp_client_secret
-  aio_sp_object_id             = var.should_create_aio_akv_sp ? azuread_service_principal.aio_sp[0].object_id : var.aio_akv_sp_client_id
-  aio_sp_client_id             = var.should_create_aio_akv_sp ? azuread_service_principal.aio_sp[0].client_id : var.aio_akv_sp_client_id
-  aio_sp_client_secret         = var.should_create_aio_akv_sp ? azuread_application_password.aio_sp[0].value : var.aio_akv_sp_client_secret
-}
+  aio_onboard_sp_object_id     = var.should_create_aio_onboard_sp ? module.service_principal.service_principal_aio_onboard_object_id : var.aio_onboard_sp_object_id
+  aio_onboard_sp_client_id     = var.should_create_aio_onboard_sp ? module.service_principal.service_principal_aio_onboard_client_id : var.aio_onboard_sp_client_id
+  aio_onboard_sp_client_secret = var.should_create_aio_onboard_sp ? module.service_principal.service_principal_aio_onboard_application_password : var.aio_onboard_sp_client_secret
+  aio_sp_object_id             = var.should_create_aio_akv_sp ? module.service_principal.service_principal_aio_object_id : var.aio_akv_sp_object_id
+  aio_sp_client_id             = var.should_create_aio_akv_sp ? module.service_principal.service_principal_aio_client_id : var.aio_akv_sp_client_id
+  aio_sp_client_secret         = var.should_create_aio_akv_sp ? module.service_principal.service_principal_aio_password : var.aio_akv_sp_client_secret
 
-data "azurerm_client_config" "current" {
-}
-
-resource "azurerm_resource_group" "this" {
-  count = var.should_create_resource_group ? 1 : 0
-
-  name     = local.resource_group_name
-  location = var.location
-}
-
-data "azurerm_resource_group" "this" {
-  count = var.should_create_resource_group ? 0 : 1
-
-  name = local.resource_group_name
-}
-
-resource "azurerm_public_ip" "this" {
-  name                = "ip-${var.name}"
-  location            = var.location
-  resource_group_name = local.resource_group_name
-  allocation_method   = "Static"
-  sku                 = "Standard"
-  zones               = ["1"]
-}
-
-resource "azurerm_network_interface" "this" {
-  name                = "nic-${var.name}"
-  location            = var.location
-  resource_group_name = local.resource_group_name
-
-  ip_configuration {
-    name                          = "internal"
-    subnet_id                     = azurerm_subnet.this.id
-    private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.this.id
-  }
-}
-
-///
-// Deploys a large enough VM that has:
-// - Enough memory and cpu to run the AIO workloads.
-// - Hypervisor support if using Windows for AKS EE.
-///
-
-// TODO: Windows VM setup is currently not implemented. Requires install script similar to linux-vm-setup.tftpl.sh
-/*
-resource "azurerm_windows_virtual_machine" "this" {
-  count = var.should_use_linux ? 0 : 1
-
-  name                                                   = "vm-${var.name}"
-  resource_group_name                                    = local.resource_group_name
-  location                                               = var.location
-  size                                                   = "Standard_D4_v5"
-  computer_name                                          = var.vm_computer_name
-  admin_username                                         = var.vm_username
-  admin_password                                         = var.vm_password
-  bypass_platform_safety_checks_on_user_schedule_enabled = true
-  patch_assessment_mode                                  = "AutomaticByPlatform"
-  patch_mode                                             = "AutomaticByPlatform"
-  network_interface_ids = [
-    azurerm_network_interface.this.id,
-  ]
-
-  os_disk {
-    caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS"
-  }
-
-  source_image_reference {
-    publisher = "MicrosoftWindowsServer"
-    offer     = "WindowsServer"
-    sku       = "2022-Datacenter"
-    version   = "latest"
-  }
-}
-*/
-
-resource "azurerm_linux_virtual_machine" "this" {
-  count = var.should_use_linux ? 1 : 0
-
-  name                  = "vm-${var.name}"
-  resource_group_name   = local.resource_group_name
-  location              = var.location
-  size                  = var.vm_size
-  computer_name         = var.vm_computer_name
-  admin_username        = var.vm_username
-  patch_assessment_mode = "AutomaticByPlatform"
-  patch_mode            = "AutomaticByPlatform"
-  network_interface_ids = [
-    azurerm_network_interface.this.id,
-  ]
-
-  admin_ssh_key {
-    username   = var.vm_username
-    public_key = file(var.vm_ssh_pub_key_file)
-  }
-
-  os_disk {
-    caching              = "ReadWrite"
-    storage_account_type = var.vm_storage_account_type
-  }
-
-  source_image_reference {
-    publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "22_04-lts-gen2"
-    version   = "latest"
-  }
-
-  depends_on = [
-    azurerm_key_vault_access_policy.aio_kv_admin_user,
-    azurerm_key_vault_access_policy.aio_kv_current_user,
-    azurerm_key_vault_access_policy.aio_onboard_sp,
-    azurerm_key_vault_access_policy.aio_sp,
-  ]
-}
-
-///
-// Send a script to the VM that does the following:
-// - Configures the VM to support AIO.
-// - Downloads and installs a Kubernetes cluster.
-// - Connects the new cluster to Azure Arc in the new Resource Group.
-// - Initial cluster pre-requisites to support AIO.
-///
-
-locals {
   aio_default_spc_params = {
     aio_spc_name          = var.aio_spc_name
     aio_cluster_namespace = var.aio_cluster_namespace
-    aio_kv_name           = local.azure_key_vault_name
+    aio_kv_name           = module.key_vault.keyvault_name
     aio_tenant_id         = data.azurerm_client_config.current.tenant_id
   }
   aio_ca_cert_trust_secret_params = {
@@ -160,63 +33,173 @@ locals {
     aio_ca_cert_pem       = base64encode(tls_self_signed_cert.ca.cert_pem)
     aio_ca_key_pem        = base64encode(tls_private_key.ca.private_key_pem)
   }
-  linux_vm_setup_params = {
-    tenant_id         = data.azurerm_client_config.current.tenant_id
-    subscription_id   = data.azurerm_client_config.current.subscription_id
-    location          = var.location
-    cluster_admin_oid = local.admin_object_id
 
-    resource_group_name = local.resource_group_name
+  server_setup_params = {
+    cluster_admin_oid   = local.admin_object_id
+    resource_group_name = module.resource_group.resource_group_name
+    tenant_id           = data.azurerm_client_config.current.tenant_id
+    arc_resource_name   = local.arc_resource_name
+    subscription_id     = data.azurerm_client_config.current.subscription_id
+    location            = var.location
 
-    arc_resource_name            = local.arc_resource_name
+    aio_cluster_namespace        = var.aio_cluster_namespace
+    aio_kv_name                  = module.key_vault.keyvault_name
+    aio_akv_sp_secret_name       = var.aio_akv_sp_secret_name
+    aio_default_spc              = templatefile("${path.module}/manifests/aio-default-spc.tftpl.yaml", local.aio_default_spc_params)
     aio_onboard_sp_client_id     = local.aio_onboard_sp_client_id
     aio_onboard_sp_client_secret = local.aio_onboard_sp_client_secret
-
-    public_ip = azurerm_public_ip.this.ip_address
-
-    custom_locations_oid = data.azuread_service_principal.custom_locations_rp.object_id
-
-    aio_cluster_namespace     = var.aio_cluster_namespace
-    aio_kv_name               = local.azure_key_vault_name
-    aio_akv_sp_secret_name    = var.aio_akv_sp_secret_name
-    aio_default_spc           = templatefile("${path.module}/manifests/aio-default-spc.tftpl.yaml", local.aio_default_spc_params)
-    aio_sp_client_id          = local.aio_sp_client_id
-    aio_sp_client_secret      = local.aio_sp_client_secret
-    aio_trust_config_map_name = var.aio_trust_config_map_name
-    aio_ca_cert_pem           = tls_self_signed_cert.ca.cert_pem
-    aio_ca_cert_trust_secret  = templatefile("${path.module}/manifests/aio-ca-cert-trust-secret.tftpl.yaml", local.aio_ca_cert_trust_secret_params)
+    aio_sp_client_id             = local.aio_sp_client_id
+    aio_sp_client_secret         = local.aio_sp_client_secret
+    aio_ca_cert_pem              = tls_self_signed_cert.ca.cert_pem
+    aio_ca_cert_trust_secret     = templatefile("${path.module}/manifests/aio-ca-cert-trust-secret.tftpl.yaml", local.aio_ca_cert_trust_secret_params)
+    aio_trust_config_map_name    = var.aio_trust_config_map_name
+    custom_locations_oid         = module.service_principal.custom_locations_rp
   }
 
-  linux_vm_setup = templatefile("${path.module}/scripts/linux-vm-setup.tftpl.sh", local.linux_vm_setup_params)
+  server_setup = var.is_linux_server ? templatefile("${path.module}/scripts/linux-server-setup.sh", local.server_setup_params) : templatefile("${path.module}/scripts/windows-server-setup.sh", local.server_setup_params)
 }
 
-// Only use for debugging the linux-vm-setup.sh script.
-// Outputs the generated linux-vm-setup.sh script to the <project>/out directory.
-/*
-resource "local_sensitive_file" "linux_vm_setup" {
-  count    = var.should_use_linux ? 1 : 0
-  filename = "../../out/linux-vm-setup.sh"
-  content  = local.linux_vm_setup
+data "azurerm_client_config" "current" {
 }
-*/
 
-// Downloads and runs at /var/lib/waagent/custom-script/download/0 on the VM.
-// If there are problems then check the logs at the following locations on the VM.
-// - stdout -> /var/lib/waagent/custom-script/download/0/stdout
-// - stderr -> /var/lib/waagent/custom-script/download/0/stderr
-resource "azurerm_virtual_machine_extension" "linux_setup" {
-  count                       = var.should_use_linux ? 1 : 0
-  name                        = "linux-vm-setup"
-  virtual_machine_id          = azurerm_linux_virtual_machine.this[0].id
-  publisher                   = "Microsoft.Azure.Extensions"
-  type                        = "CustomScript"
-  type_handler_version        = "2.1"
-  automatic_upgrade_enabled   = false
-  auto_upgrade_minor_version  = false
-  failure_suppression_enabled = false
-  protected_settings          = <<SETTINGS
-  {
-    "script": "${base64encode(local.linux_vm_setup)}"
-  }
-  SETTINGS
+module "resource_group" {
+  source                       = "../resources/resource-group"
+  should_create_resource_group = true
+
+  name     = local.resource_name
+  location = var.location
+}
+
+module "storage_account" {
+  source = "../resources/storage-account"
+  count  = var.should_create_storage_account ? 1 : 0
+
+  should_create_storage_account            = true
+  should_create_storage_account_containers = true
+
+  depends_on = [module.resource_group]
+
+  name                = local.resource_name_condensed
+  location            = var.location
+  resource_group_name = module.resource_group.resource_group_name
+
+  storage_account_tier             = var.storage_account_tier
+  storage_account_replication_type = var.storage_account_replication_type
+  containers                       = var.containers
+  container_access_type            = var.container_access_type
+}
+
+module "container_registry" {
+  source = "../resources/container-registry"
+  count  = var.should_create_container_registry ? 1 : 0
+
+  should_create_container_registry = true
+
+  name                = local.resource_name_condensed
+  location            = var.location
+  resource_group_name = module.resource_group.resource_group_name
+  sku                 = var.container_registry_sku
+}
+
+module "key_vault" {
+  source                           = "../resources/key-vault"
+  should_create_key_vault          = true
+  should_create_key_vault_policies = true
+
+  name                         = local.resource_name
+  resource_group_name          = module.resource_group.resource_group_name
+  location                     = module.resource_group.resource_group_location
+  admin_object_id              = local.admin_object_id
+  aio_sp_object_id             = local.aio_sp_object_id
+  aio_onboard_sp_object_id     = local.aio_onboard_sp_object_id
+  aio_placeholder_secret_value = var.aio_placeholder_secret_value
+}
+
+module "service_principal" {
+  source = "../resources/service-principal"
+
+  name                         = local.resource_name
+  should_create_aio_onboard_sp = var.should_create_aio_onboard_sp
+  should_create_aio_akv_sp     = var.should_create_aio_akv_sp
+  admin_object_id              = local.admin_object_id
+}
+
+resource "azurerm_key_vault_secret" "kv_sp_aio_secret" {
+  name         = "sp-aio-secret"
+  key_vault_id = module.key_vault.keyvault_id
+  value        = module.service_principal.service_principal_aio_password
+
+  depends_on = [module.key_vault, module.service_principal]
+}
+
+module "event_hub" {
+  source = "../resources/event-hub"
+  count  = var.should_use_event_hub ? 1 : 0
+
+  should_create_event_hub_namespace = true
+
+  name                = local.resource_name
+  resource_group_name = module.resource_group.resource_group_name
+  location            = module.resource_group.resource_group_location
+
+  should_create_event_hub = false
+}
+
+module "event_grid" {
+  source = "../resources/event-grid"
+  count  = var.should_use_event_grid ? 1 : 0
+
+  should_create_eventgrid_namespace = true
+
+  name              = local.resource_name
+  location          = module.resource_group.resource_group_location
+  resource_group_id = module.resource_group.resource_group_id
+
+  enable_mqtt_broker              = true
+  should_create_event_grid_topics = false
+}
+
+module "virtual_machine" {
+  source = "../resources/virtual-machine"
+  count  = local.create_virtual_machine ? 1 : 0
+
+  should_create_virtual_machine = true
+  should_create_network         = true
+
+  name                = local.resource_name
+  resource_group_name = module.resource_group.resource_group_name
+  location            = module.resource_group.resource_group_location
+
+  vm_computer_name = var.name
+  vm_username      = var.name
+  vm_password      = random_password.password[0].result
+  vm_setup_script  = local.server_setup
+  vm_size          = var.vm_size
+
+  depends_on = [
+    module.key_vault,
+    module.service_principal
+  ]
+}
+
+resource "random_password" "password" {
+  count = local.create_virtual_machine ? 1 : 0
+
+  length           = 12
+  special          = true
+  override_special = "!#$%*?"
+  min_lower        = 1
+  min_upper        = 1
+  min_numeric      = 1
+  min_special      = 1
+}
+
+resource "azurerm_key_vault_secret" "kv_virtual_machine_secret" {
+  count = local.create_virtual_machine ? 1 : 0
+
+  name         = "virtual-machine-password"
+  key_vault_id = module.key_vault.keyvault_id
+  value        = random_password.password[0].result
+
+  depends_on = [module.key_vault, module.virtual_machine]
 }

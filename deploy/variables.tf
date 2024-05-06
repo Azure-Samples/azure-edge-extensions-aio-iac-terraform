@@ -10,29 +10,42 @@ variable "name" {
 
 variable "location" {
   type    = string
-  default = "westus3"
+  default = "eastus2"
 }
 
-variable "vm_computer_name" {
-  description = "The Computer Name for the VM."
-  type        = string
-  nullable    = false
+variable "should_create_virtual_machine" {
+  description = "(Optional) Create a virtual machine"
+  type        = bool
+  default     = false
 }
 
-variable "vm_username" {
-  description = "The Username used to login to the VM."
-  type        = string
-  nullable    = false
-  validation {
-    condition     = can(regex("^[a-z0-9][a-z0-9-]{1,60}[a-z0-9]$", var.vm_username))
-    error_message = "Please update 'vm_username' which only has lowercase letters, numbers, '-' hyphens."
-  }
+variable "is_linux_server" {
+  description = "The OS of the server."
+  type        = bool
 }
 
-variable "vm_ssh_pub_key_file" {
-  description = "(Required for Linux VMs) The file path to the SSH public key."
-  type        = string
-  default     = null
+variable "should_create_storage_account"{ 
+  description = "Creates a new Storage Account"
+  type        = bool
+  default     = false
+}
+
+variable "should_create_container_registry" {
+  description = "Creates a new Container Registry"
+  type        = bool
+  default     = false
+}
+
+variable "should_use_event_hub" {
+  description = "(Optional) Use Event Hub for AIO to send data to cloud"
+  type        = bool
+  default     = false
+}
+
+variable "should_use_event_grid" {
+  description = "(Optional) Use Event Grid for AIO to send data to cloud"
+  type        = bool
+  default     = false
 }
 
 variable "vm_size" {

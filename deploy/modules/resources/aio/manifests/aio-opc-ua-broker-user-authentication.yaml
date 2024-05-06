@@ -1,0 +1,25 @@
+apiVersion: secrets-store.csi.x-k8s.io/v1
+kind: SecretProviderClass
+metadata:
+  name: aio-opc-ua-broker-user-authentication
+  namespace: ${aio_cluster_namespace}
+spec:
+  parameters:
+    keyvaultName: ${aio_keyvault_name}
+    objects: |
+      array:
+        - |
+          objectName: placeholder-secret
+          objectType: secret
+          objectVersion: ""
+        - |
+          objectName: opcuausername
+          objectType: secret
+          objectVersion: ""
+        - |
+          objectName: opcuapassword
+          objectType: secret
+          objectVersion: ""
+    tenantId: ${aio_tenant_id}
+    usePodIdentity: 'false'
+  provider: azure

@@ -4,7 +4,7 @@ resource "azapi_resource" "aio_targets_opc_plc_sim" {
   type                      = "Microsoft.IoTOperationsOrchestrator/targets@2023-10-04-preview"
   name                      = "${var.name}-tgt-sim"
   location                  = var.location
-  parent_id                 = data.azurerm_resource_group.this.id
+  parent_id                 = module.resource_group.resource_group_id
 
   body = jsonencode({
     extendedLocation = {
@@ -41,53 +41,6 @@ resource "azapi_resource" "aio_targets_opc_plc_sim" {
           properties = {
             resource = yamldecode(templatefile("${path.module}/manifests/opc-plc-server/opcplc_service.tftpl.yaml", {
               opc_plc_sim_server_name = var.opc_plc_sim_server_name
-            }))
-          }
-        },
-      ]
-
-      "topologies" = [
-        {
-          "bindings" = [
-            {
-              "role" : "yaml.k8s",
-              "provider" : "providers.target.kubectl",
-              "config" : {
-                "inCluster" : "true"
-              }
-            }
-          ]
-        }
-      ]
-    }
-  })
-}
-
-resource "azapi_resource" "aio_targets_mqtt_client" {
-  count                     = var.should_install_insecure_mqtt_client_for_mqttui ? 1 : 0
-  schema_validation_enabled = false
-  type                      = "Microsoft.IoTOperationsOrchestrator/targets@2023-10-04-preview"
-  name                      = "${var.name}-tgt-mc"
-  location                  = var.location
-  parent_id                 = data.azurerm_resource_group.this.id
-
-  body = jsonencode({
-    extendedLocation = {
-      name = local.custom_locations_id
-      type = "CustomLocation"
-    }
-
-    properties = {
-      "scope"   = var.aio_cluster_namespace
-      "version" = var.aio_targets_main_version
-      "components" = [
-        {
-          name = "mqtt-client"
-          type = "yaml.k8s"
-          properties = {
-            resource = yamldecode(templatefile("${path.module}/manifests/mqtt-client-deployment.tftpl.yaml", {
-              aio_mq_auth_sat_audience  = var.aio_mq_auth_sat_audience
-              aio_trust_config_map_name = var.aio_trust_config_map_name
             }))
           }
         },

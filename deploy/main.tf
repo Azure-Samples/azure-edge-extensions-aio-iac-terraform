@@ -2,14 +2,18 @@ module "infra" {
   count  = var.should_install_infra ? 1 : 0
   source = "./modules/infra"
 
-  name                = var.name
-  location            = var.location
-  vm_computer_name    = var.vm_computer_name
-  vm_username         = var.vm_username
-  vm_ssh_pub_key_file = var.vm_ssh_pub_key_file
+  name     = var.name
+  location = var.location
 
-  vm_size                 = var.vm_size
-  vm_storage_account_type = var.vm_storage_account_type
+  should_create_storage_account    = var.should_create_storage_account
+  should_create_container_registry = var.should_create_container_registry
+
+  should_create_virtual_machine = var.should_create_virtual_machine
+  is_linux_server               = var.is_linux_server
+  vm_size                       = var.vm_size
+
+  should_use_event_hub  = var.should_use_event_hub
+  should_use_event_grid = var.should_use_event_grid
 }
 
 module "aio_full" {
@@ -21,10 +25,10 @@ module "aio_full" {
   name     = var.name
   location = var.location
 
-  resource_group_name        = var.should_install_infra ? null : var.resource_group_name
-  arc_cluster_name           = var.should_install_infra ? null : var.arc_cluster_name
-  key_vault_name             = var.should_install_infra ? null : var.key_vault_name
-  aio_akri_kubernetes_distro = var.kubernetes_distro
+  kubernetes_distro = var.kubernetes_distro
+
+  should_use_event_hub  = var.should_use_event_hub
+  should_use_event_grid = var.should_use_event_grid
 }
 
 module "opc_plc_sim" {
@@ -33,19 +37,9 @@ module "opc_plc_sim" {
 
   depends_on = [module.aio_full]
 
-  name     = var.name
-  location = var.location
-
-  resource_group_name = var.resource_group_name
-  arc_cluster_name    = var.arc_cluster_name
-}
-
-output "vm_public_ip" {
-  value = var.should_install_infra ? module.infra[0].vm_public_ip : null
-}
-
-output "ssh_command" {
-  value = var.should_install_infra ? module.infra[0].ssh_command : null
+  name             = var.name
+  location         = var.location
+  arc_cluster_name = var.arc_cluster_name
 }
 
 output "resource_group_name" {
