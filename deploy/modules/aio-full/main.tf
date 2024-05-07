@@ -8,7 +8,11 @@ data "azurerm_client_config" "current" {
 module "azure_iot_operations" {
   source = "../resources/aio"
 
-  name                               = var.name
+  name                = var.name
+  resource_group_name = var.resource_group_name
+  key_vault_name      = var.key_vault_name
+  arc_cluster_name    = var.arc_cluster_name
+
   location                           = var.location
   aio_mq_broker_auth_non_tls_enabled = var.aio_mq_broker_auth_non_tls_enabled
   aio_akri_kubernetes_distro         = var.kubernetes_distro

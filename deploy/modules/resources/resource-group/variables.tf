@@ -5,7 +5,13 @@ variable "should_create_resource_group" {
 }
 
 variable "name" {
+  description = "The name of the resource group to create."
   type = string
+}
+
+variable "resource_group_name" {
+  description = "The name of the existing resource group."
+  type        = string
 }
 
 variable "location" {

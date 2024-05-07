@@ -15,6 +15,12 @@ variable "name" {
   type        = string
 }
 
+variable "key_vault_name" {
+  description = "Name of the existing key vault"
+  type        = string
+  default     = null
+}
+
 variable "resource_group_name" {
   description = "Name of the resource group"
   type        = string

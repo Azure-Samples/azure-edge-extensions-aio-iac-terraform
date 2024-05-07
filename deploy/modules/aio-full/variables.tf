@@ -13,6 +13,24 @@ variable "location" {
   default = "eastus2"
 }
 
+variable "resource_group_name" {
+  description = "(Optional) The existing resource group name for where the Azure Arc Cluster resource is located. (Otherwise, uses '<var.name>')"
+  type        = string
+  default     = null
+}
+
+variable "arc_cluster_name" {
+  description = "(Optional) The existing Arc Cluster resource name. (Otherwise, uses '<var.name>')"
+  type        = string
+  default     = null
+}
+
+variable "key_vault_name" {
+  description = "(Optional) The existing Azure Key Vault resource name. (Otherwise, uses '<var.name>')"
+  type        = string
+  default     = null
+}
+
 variable "aio_mq_broker_auth_non_tls_enabled" {
   description = "Flag to create a non-tls mq broker"
   type        = bool

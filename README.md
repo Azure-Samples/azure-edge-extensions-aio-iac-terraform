@@ -29,9 +29,7 @@ This project utilizes Terraform to do the following:
 
 ### Providers Registered
 
-[deploy/modules/infra/register-providers.tf](deploy/modules/infra/register-providers.tf) will attempt to register all of the necessary Azure providers but if you are running this deployment on a Windows machine you may still need to manually register the providers due to limitations with Terraform's `local-exec`.
-
-This can be achieved by running the following Azure CLI commands from the command line (after `az login`):
+You may need to manually register the providers. This can be achieved by running the following Azure CLI commands from the command line (after `az login`):
 
 ```shell
 az provider register -n "Microsoft.ExtendedLocation"
@@ -54,12 +52,7 @@ az provider show -n "Microsoft.DeviceRegistry" --query "registrationState"
 
 ### Quickstart
 
-1. Generate a new ssh key to use with the new VM (replace the `<computer-username>` with the username that will be used for the VM):
-    ```shell
-    ssh-keygen -t rsa -b 4096 -C "<computer-username>" -f ~/.ssh/id_aio_rsa
-    # Press enter twice unless you want a passphrase
-    ```
-2. Login to the AZ CLI:
+1. Login to the AZ CLI:
     ```shell
     az login --tenant <tenant>.onmicrosoft.com
     ```
@@ -68,18 +61,18 @@ az provider show -n "Microsoft.DeviceRegistry" --query "registrationState"
      ```shell
      az account set -s <subscription-id>
      ```
-3. Add a `<unique-name>.auto.tfvars` file to the root of the [deploy](deploy) directory that contains the following (refer to [deploy/sample-aio.auto.tfvars.example](deploy/sample-aio.auto.tfvars.example) for an example):
+1. Add a `<unique-name>.auto.tfvars` file to the root of the [deploy](deploy) directory that contains the following (refer to [deploy/sample-aio.auto.tfvars.example](deploy/sample-aio.auto.tfvars.example) for an example):
     ```hcl
     // <project-root>/deploy/<unique-name>.auto.tfvars
 
-    name     = "<unique-name>"
-    location = "<location>"
+    name     = "sample-aio"
+    location = "westus3"
 
-    vm_computer_name             = "<unique-computer-name>"
-    vm_username                  = "<unique-vm-username>"
-    vm_ssh_pub_key_file          = "~/.ssh/<ssh-key-name>.pub"
+    should_create_virtual_machine = "<true/false>"
+    is_linux_server               = "<true/false>"
+    should_use_event_hub          = "<true/false>"
     ```
-4. From the [deploy](deploy) directory execute the following (the `<unique-name>.auto.tfvars` created earlier will automatically be applied):
+1. From the [deploy](deploy) directory execute the following (the `<unique-name>.auto.tfvars` created earlier will automatically be applied):
    ```shell
    terraform init
    terraform apply
@@ -129,9 +122,9 @@ Refer to [deploy/modules/infra/scripts](./deploy/modules/infra/scripts) and [dep
 
 1. Refer to the [Quickstart](#quickstart) for instructions on setting up the root `.tfvars` file.
 2. Update the new `<unique-name>.auto.tfvars` with the following (unless defaults were used):
-   1. The `resource_group_name` unless different from `rg-<name>`.
-   2. The `arc_cluster_name` unless different from `arc-<name>`.
-   3. The `key_vault_name` unless different from `kv-<name>`.
+   1. The `resource_group_name`.
+   2. The `arc_cluster_name`.
+   3. The `key_vault_name`.
 3. Execute the `terraform` commands the same way in the [deploy](deploy) directory:
    ```shell
    terraform init
