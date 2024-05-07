@@ -1,16 +1,16 @@
 locals {
-  key_vault_name_onboard = var.should_create_aio_onboard_sp ? "sp-${var.name}-onboard" : var.key_vault_name_onboard
-  key_vault_name_akv     = var.should_create_aio_akv_sp ? "sp-${var.name}-akv" : var.key_vault_name_akv
+  sp_onboard_name = var.should_create_onboard_sp ? "sp-${var.name}-onboard" : data.azuread_application.aio_onboard_sp.display_name
+  sp_name         = var.should_create_sp ? "sp-${var.name}-akv" : data.azuread_application.aio_sp_akv.display_name
 
-  onboard_sp_client_id = var.should_create_aio_onboard_sp ? azuread_application.aio_onboard_sp[0].client_id : data.azuread_application.aio_onboard_sp[0].client_id
-  onboard_sp_object_id = var.should_create_aio_onboard_sp ? azuread_application.aio_onboard_sp[0].object_id : data.azuread_application.aio_onboard_sp[0].object_id
-  sp_client_id         = var.should_create_aio_akv_sp ? azuread_application.aio_sp_akv[0].client_id : data.azuread_application.aio_sp_akv[0].client_id
-  sp_object_id         = var.should_create_aio_akv_sp ? azuread_application.aio_sp_akv[0].object_id : data.azuread_application.aio_sp_akv[0].object_id
+  app_reg_onboard_client_id = var.should_create_onboard_sp ? azuread_application.app_reg_onboard[0].client_id : data.azuread_application.app_reg_onboard[0].client_id
+  app_reg_onboard_object_id = var.should_create_onboard_sp ? azuread_application.app_reg_onboard[0].object_id : data.azuread_application.app_reg_onboard[0].object_id
+  app_reg_client_id         = var.should_create_sp ? azuread_application.app_reg[0].client_id : data.azuread_application.app_reg[0].client_id
+  app_reg_object_id         = var.should_create_sp ? azuread_application.app_reg[0].object_id : data.azuread_application.app_reg[0].object_id
 
-  aio_onboard_sp_object_id = var.should_create_aio_onboard_sp ? azuread_service_principal.aio_onboard_sp[0].object_id : data.azuread_application.aio_onboard_sp[0].object_id
-  aio_onboard_sp_client_id = var.should_create_aio_onboard_sp ? azuread_service_principal.aio_onboard_sp[0].client_id : data.azuread_service_principal.aio_onboard_sp[0].client_id
-  aio_sp_akv_object_id     = var.should_create_aio_akv_sp ? azuread_service_principal.aio_sp_akv[0].object_id : data.azuread_application.aio_sp_akv[0].object_id
-  aio_sp_akv_client_id     = var.should_create_aio_akv_sp ? azuread_service_principal.aio_sp_akv[0].client_id : data.azuread_service_principal.aio_sp_akv[0].client_id
+  sp_onboard_object_id = var.should_create_onboard_sp ? azuread_service_principal.sp_onboard[0].object_id : data.azuread_service_principal.sp_onboard[0].object_id
+  sp_onboard_client_id = var.should_create_onboard_sp ? azuread_service_principal.sp_onboard[0].client_id : data.azuread_service_principal.sp_onboard[0].client_id
+  sp_object_id         = var.should_create_sp ? azuread_service_principal.sp[0].object_id : data.azuread_service_principal.sp[0].object_id
+  sp_client_id         = var.should_create_sp ? azuread_service_principal.sp[0].client_id : data.azuread_service_principal.sp[0].client_id
 }
 
 data "azuread_application_published_app_ids" "well_known" {
@@ -26,46 +26,46 @@ data "azuread_service_principal" "custom_locations_rp" {
 }
 
 // Onboarding Service Principal which will have access to create Arc and Arc Extensions
-resource "azuread_application" "aio_onboard_sp" {
-  count = var.should_create_aio_onboard_sp ? 1 : 0
+resource "azuread_application" "app_reg_onboard" {
+  count = var.should_create_onboard_sp ? 1 : 0
 
-  display_name = local.key_vault_name_onboard
+  display_name = local.sp_onboard_name
   owners       = [var.admin_object_id]
 }
 
-data "azuread_application" "aio_onboard_sp" {
-  count = var.should_create_aio_onboard_sp ? 0 : 1
+data "azuread_application" "app_reg_onboard" {
+  count = var.should_create_onboard_sp ? 0 : 1
 
-  display_name = local.key_vault_name_onboard
+  client_id = var.sp_onboard_client_id
 }
 
-resource "azuread_service_principal" "aio_onboard_sp" {
-  count = var.should_create_aio_onboard_sp ? 1 : 0
+resource "azuread_service_principal" "sp_onboard" {
+  count = var.should_create_onboard_sp ? 1 : 0
 
-  client_id       = local.onboard_sp_client_id
+  client_id       = local.app_reg_onboard_client_id
   account_enabled = true
   owners          = [var.admin_object_id]
 }
 
-data "azuread_service_principal" "aio_onboard_sp" {
-  count = var.should_create_aio_onboard_sp ? 0 : 1
+data "azuread_service_principal" "sp_onboard" {
+  count = var.should_create_onboard_sp ? 0 : 1
 
-  client_id = local.onboard_sp_client_id
+  client_id = local.app_reg_onboard_client_id
 }
 
-resource "azuread_application_password" "aio_onboard_sp" {
-  count = var.should_create_aio_onboard_sp ? 1 : 0
+resource "azuread_application_password" "sp_onboard" {
+  count = var.should_create_onboard_sp_secret ? 1 : 0
 
-  display_name      = "rbac"
-  application_id    = "/applications/${local.onboard_sp_object_id}"
+  display_name      = "${var.name}-rbac"
+  application_id    = "/applications/${local.app_reg_onboard_object_id}"
   end_date_relative = "720h" // valid for 30 days then must be rotated for continued use.
 }
 
 // AIO Service Principal which will have access to Key Vault
-resource "azuread_application" "aio_sp_akv" {
-  count = var.should_create_aio_akv_sp ? 1 : 0
+resource "azuread_application" "app_reg" {
+  count = var.should_create_sp ? 1 : 0
 
-  display_name = local.key_vault_name_akv
+  display_name = local.sp_name
   owners       = [var.admin_object_id]
 
   required_resource_access {
@@ -78,29 +78,30 @@ resource "azuread_application" "aio_sp_akv" {
   }
 }
 
-data "azuread_application" "aio_sp_akv" {
-  count = var.should_create_aio_akv_sp ? 0 : 1
+data "azuread_application" "app_reg" {
+  count = var.should_create_sp ? 0 : 1
 
-  display_name = local.key_vault_name_akv
+  client_id = var.sp_client_id
 }
 
-resource "azuread_service_principal" "aio_sp_akv" {
-  count = var.should_create_aio_akv_sp ? 1 : 0
+resource "azuread_service_principal" "sp" {
+  count = var.should_create_sp ? 1 : 0
 
-  client_id       = local.sp_client_id
+  client_id       = local.app_reg_client_id
   account_enabled = true
   owners          = [var.admin_object_id]
 }
 
-data "azuread_service_principal" "aio_sp_akv" {
-  count = var.should_create_aio_onboard_sp ? 0 : 1
+data "azuread_service_principal" "sp" {
+  count = var.should_create_sp ? 0 : 1
 
-  client_id = local.sp_client_id
+  client_id = local.app_reg_client_id
 }
 
-resource "azuread_application_password" "aio_sp_akv" {
-  count             = var.should_create_aio_akv_sp ? 1 : 0
-  display_name      = "rbac"
-  application_id    = "/applications/${local.sp_object_id}"
+resource "azuread_application_password" "sp" {
+  count = var.should_create_sp_secret ? 1 : 0
+
+  display_name      = "${var.name}-rbac"
+  application_id    = "/applications/${local.app_reg_object_id}"
   end_date_relative = "4383h" // valid for 6 months then must be rotated for continued use.
 }

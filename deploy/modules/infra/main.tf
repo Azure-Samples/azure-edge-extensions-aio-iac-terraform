@@ -14,12 +14,12 @@ locals {
 
   admin_object_id = var.admin_object_id == null ? data.azurerm_client_config.current.object_id : var.admin_object_id
 
-  aio_onboard_sp_object_id     = var.should_create_aio_onboard_sp ? module.service_principal.service_principal_aio_onboard_object_id : var.aio_onboard_sp_object_id
-  aio_onboard_sp_client_id     = var.should_create_aio_onboard_sp ? module.service_principal.service_principal_aio_onboard_client_id : var.aio_onboard_sp_client_id
-  aio_onboard_sp_client_secret = var.should_create_aio_onboard_sp ? module.service_principal.service_principal_aio_onboard_application_password : var.aio_onboard_sp_client_secret
-  aio_sp_object_id             = var.should_create_aio_akv_sp ? module.service_principal.service_principal_aio_object_id : var.aio_akv_sp_object_id
-  aio_sp_client_id             = var.should_create_aio_akv_sp ? module.service_principal.service_principal_aio_client_id : var.aio_akv_sp_client_id
-  aio_sp_client_secret         = var.should_create_aio_akv_sp ? module.service_principal.service_principal_aio_password : var.aio_akv_sp_client_secret
+  aio_onboard_sp_object_id     = module.service_principal.service_principal_aio_onboard_object_id
+  aio_onboard_sp_client_id     = module.service_principal.service_principal_aio_onboard_client_id
+  aio_onboard_sp_client_secret = var.aio_sp_onboard_client_secret == null ? module.service_principal.service_principal_aio_onboard_application_password : var.aio_sp_onboard_client_secret
+  aio_sp_object_id             = module.service_principal.service_principal_aio_object_id
+  aio_sp_client_id             = module.service_principal.service_principal_aio_client_id
+  aio_sp_client_secret         = var.aio_sp_client_secret == null ? module.service_principal.service_principal_aio_password : var.aio_sp_client_secret
 
   aio_default_spc_params = {
     aio_spc_name          = var.aio_spc_name
@@ -27,6 +27,7 @@ locals {
     aio_kv_name           = module.key_vault.keyvault_name
     aio_tenant_id         = data.azurerm_client_config.current.tenant_id
   }
+
   aio_ca_cert_trust_secret_params = {
     aio_trust_secret_name = var.aio_trust_secret_name
     aio_cluster_namespace = var.aio_cluster_namespace
@@ -123,10 +124,17 @@ module "key_vault" {
 module "service_principal" {
   source = "../resources/service-principal"
 
-  name                         = local.resource_name
-  should_create_aio_onboard_sp = var.should_create_aio_onboard_sp
-  should_create_aio_akv_sp     = var.should_create_aio_akv_sp
-  admin_object_id              = local.admin_object_id
+  name = local.resource_name
+
+  should_create_onboard_sp        = var.should_create_aio_onboard_sp
+  sp_onboard_client_id            = var.aio_sp_onboard_client_id
+  should_create_onboard_sp_secret = var.aio_sp_onboard_client_secret == null
+
+  should_create_sp        = var.should_create_aio_sp
+  sp_client_id            = var.aio_sp_client_id
+  should_create_sp_secret = var.aio_sp_client_secret == null
+
+  admin_object_id = local.admin_object_id
 }
 
 resource "azurerm_key_vault_secret" "kv_sp_aio_secret" {

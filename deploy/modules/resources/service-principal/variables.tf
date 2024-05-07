@@ -5,14 +5,26 @@ variable "name" {
   nullable    = false
 }
 
-variable "should_create_aio_akv_sp" {
+variable "should_create_onboard_sp" {
+  description = "Creates a new Service Principal with 'Kubernetes Cluster - Azure Arc Onboarding' and 'Kubernetes Extension Contributor' roles for onboarding the new cluster to Arc."
+  type        = bool
+  default     = true
+}
+
+variable "should_create_sp" {
   description = "Creates a new Service Principal with 'Get' and 'List' permissions on Azure Key Vault for AIO to use in the cluster."
   type        = bool
   default     = true
 }
 
-variable "should_create_aio_onboard_sp" {
-  description = "Creates a new Service Principal with 'Kubernetes Cluster - Azure Arc Onboarding' and 'Kubernetes Extension Contributor' roles for onboarding the new cluster to Arc."
+variable "should_create_onboard_sp_secret"{
+  description = "Creates a new RBAC secret for the AIO Onboarding Service Principal."
+  type        = bool
+  default     = true
+}
+
+variable "should_create_sp_secret"{
+  description = "Creates a new RBAC secret for the AIO Service Principal."
   type        = bool
   default     = true
 }
@@ -24,14 +36,14 @@ variable "admin_object_id" {
   nullable    = true
 }
 
-variable "key_vault_name_onboard" {
-  description = "The name of the onboard Service Principal."
+variable "sp_onboard_client_id" {
+  description = "The name of the Azure Key Vault to create the onboard SP secret in."
   type        = string
-  default     = "kv-onboard-sp"
+  default     = null
 }
 
-variable "key_vault_name_akv" {
-  description = "The name of the AIO Service Principal."
+variable "sp_client_id" {
+  description = "The name of the Azure Key Vault to create the SP secret in."
   type        = string
-  default     = "kv-aio-sp"
+  default     = null
 }
