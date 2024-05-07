@@ -95,6 +95,8 @@ module "container_registry" {
 
   should_create_container_registry = true
 
+  depends_on = [module.resource_group]
+
   name                = local.resource_name_condensed
   location            = var.location
   resource_group_name = module.resource_group.resource_group_name
@@ -102,9 +104,12 @@ module "container_registry" {
 }
 
 module "key_vault" {
-  source                           = "../resources/key-vault"
+  source = "../resources/key-vault"
+
   should_create_key_vault          = true
   should_create_key_vault_policies = true
+
+  depends_on = [module.resource_group]
 
   name                         = local.resource_name
   resource_group_name          = module.resource_group.resource_group_name
@@ -138,6 +143,8 @@ module "event_hub" {
 
   should_create_event_hub_namespace = true
 
+  depends_on = [module.resource_group]
+
   name                = local.resource_name
   resource_group_name = module.resource_group.resource_group_name
   location            = module.resource_group.resource_group_location
@@ -150,6 +157,8 @@ module "event_grid" {
   count  = var.should_use_event_grid ? 1 : 0
 
   should_create_eventgrid_namespace = true
+
+  depends_on = [module.resource_group]
 
   name              = local.resource_name
   location          = module.resource_group.resource_group_location
@@ -166,6 +175,11 @@ module "virtual_machine" {
   should_create_virtual_machine = true
   should_create_network         = true
 
+  depends_on = [
+    module.key_vault,
+    module.service_principal
+  ]
+
   name                = local.resource_name
   resource_group_name = module.resource_group.resource_group_name
   location            = module.resource_group.resource_group_location
@@ -175,11 +189,6 @@ module "virtual_machine" {
   vm_password      = random_password.password[0].result
   vm_setup_script  = local.server_setup
   vm_size          = var.vm_size
-
-  depends_on = [
-    module.key_vault,
-    module.service_principal
-  ]
 }
 
 resource "random_password" "password" {
@@ -201,5 +210,5 @@ resource "azurerm_key_vault_secret" "kv_virtual_machine_secret" {
   key_vault_id = module.key_vault.keyvault_id
   value        = random_password.password[0].result
 
-  depends_on = [module.key_vault, module.virtual_machine]
+  depends_on = [module.key_vault]
 }

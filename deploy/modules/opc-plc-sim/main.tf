@@ -1,4 +1,5 @@
 locals {
+  resource_name        = "${var.name}-${var.location}"
   arc_resource_name    = "arc-${var.name}"
   custom_location_name = "cl-${var.name}-aio"
   cluster_id           = var.arc_cluster_name != null ? "${module.resource_group.resource_group_id}/providers/Microsoft.Kubernetes/connectedClusters/${var.arc_cluster_name}" : "${module.resource_group.resource_group_id}/providers/Microsoft.Kubernetes/connectedClusters/${local.arc_resource_name}"
@@ -9,6 +10,6 @@ module "resource_group" {
   source                       = "../resources/resource-group"
   should_create_resource_group = false
 
-  name     = var.name
+  name     = local.resource_name
   location = var.location
 }
