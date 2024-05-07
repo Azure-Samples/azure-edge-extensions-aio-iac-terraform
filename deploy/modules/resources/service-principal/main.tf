@@ -1,6 +1,6 @@
 locals {
-  sp_onboard_name = var.should_create_onboard_sp ? "sp-${var.name}-onboard" : data.azuread_application.aio_onboard_sp.display_name
-  sp_name         = var.should_create_sp ? "sp-${var.name}-akv" : data.azuread_application.aio_sp_akv.display_name
+  sp_onboard_name = var.should_create_onboard_sp ? "sp-${var.name}-onboard" : data.azuread_application.app_reg_onboard[0].display_name
+  sp_name         = var.should_create_sp ? "sp-${var.name}-akv" : data.azuread_application.app_reg[0].display_name
 
   app_reg_onboard_client_id = var.should_create_onboard_sp ? azuread_application.app_reg_onboard[0].client_id : data.azuread_application.app_reg_onboard[0].client_id
   app_reg_onboard_object_id = var.should_create_onboard_sp ? azuread_application.app_reg_onboard[0].object_id : data.azuread_application.app_reg_onboard[0].object_id

@@ -13,6 +13,48 @@ variable "location" {
   default = "eastus2"
 }
 
+variable "should_create_aio_onboard_sp" {
+  description = "Creates a new Service Principal with 'Kubernetes Cluster - Azure Arc Onboarding' and 'Kubernetes Extension Contributor' roles for onboarding the new cluster to Arc."
+  type        = bool
+  default     = true
+}
+
+variable "should_create_aio_sp" {
+  description = "Creates a new Service Principal with 'Get' and 'List' permissions on Azure Key Vault for AIO to use in the cluster."
+  type        = bool
+  default     = true
+}
+
+variable "aio_sp_onboard_client_id" {
+  description = "(Optional) The Service Principal Client ID for onboarding the cluster to Arc. (Otherwise, creates new one)"
+  type        = string
+  default     = null
+  nullable    = true
+}
+
+variable "aio_sp_onboard_client_secret" {
+  description = "(Optional) The Service Principal Client Secret for onboarding the cluster to Arc. (Otherwise, creates new one)"
+  type        = string
+  default     = null
+  sensitive   = true
+  nullable    = true
+}
+
+variable "aio_sp_client_id" {
+  description = "(Optional) The Service Principal Client ID for AIO to use with Azure Key Vault. (Otherwise, creates new one)"
+  type        = string
+  default     = null
+  nullable    = true
+}
+
+variable "aio_sp_client_secret" {
+  description = "(Optional) The Service Principal Client Secret for AIO to use with Azure Key Vault. (Otherwise, creates new one)"
+  type        = string
+  default     = null
+  sensitive   = true
+  nullable    = true
+}
+
 variable "should_create_virtual_machine" {
   description = "(Optional) Create a virtual machine"
   type        = bool
