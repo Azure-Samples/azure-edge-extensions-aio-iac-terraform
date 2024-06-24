@@ -1,0 +1,21 @@
+apiVersion: mq.iotoperations.azure.com/v1beta1
+kind: MqttBridgeTopicMap
+metadata:
+  name: ${aio_mqtt_bridge_topic_map_name}
+  namespace: ${aio_cluster_namespace}
+spec:
+  mqttBridgeConnectorRef: ${aio_mqtt_bridge_connector_name}
+  routes:
+    - direction: remote-to-local
+      name: cloud-to-edge
+      qos: 1
+      source: ${aio_eg_remote_to_local_source_topic}
+      target: ${aio_eg_remote_to_local_target_topic}
+    #   sharedSubscription:
+    #     groupMinimumShareNumber: 3
+    #     groupName: group1
+    - direction: local-to-remote
+      name: edge-to-cloud
+      qos: 1
+      source: ${aio_eg_local_to_remote_source_topic}
+      target: ${aio_eg_local_to_remote_target_topic}

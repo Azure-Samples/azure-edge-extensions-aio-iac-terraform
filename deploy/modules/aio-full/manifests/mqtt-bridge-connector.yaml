@@ -1,0 +1,28 @@
+apiVersion: mq.iotoperations.azure.com/v1beta1
+kind: MqttBridgeConnector
+metadata:
+  name: ${aio_mqtt_bridge_connector_name}
+  namespace: ${aio_cluster_namespace}
+spec:
+  image: 
+    repository: mcr.microsoft.com/azureiotoperations/mqttbridge 
+    tag: 0.1.0-preview
+    pullPolicy: IfNotPresent
+  protocol: v5
+  bridgeInstances: 1
+  clientIdPrefix: client1-
+  logLevel: debug
+  remoteBrokerConnection:
+    endpoint: "${event_grid_endpoint}.ts.eventgrid.azure.net:8883"
+    tls:
+      tlsEnabled: true
+    authentication:
+      systemAssignedManagedIdentity:
+        audience: https://eventgrid.azure.net
+  localBrokerConnection:
+    endpoint: aio-mq-dmqtt-frontend:8883
+    tls:
+      tlsEnabled: true
+      trustedCaCertificateConfigMap: ${aio_trust_config_map_name}
+    authentication:
+      kubernetes: {}

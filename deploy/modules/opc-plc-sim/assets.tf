@@ -7,7 +7,7 @@ resource "azapi_resource" "opc_sim_aep" {
   type                      = "Microsoft.DeviceRegistry/assetEndpointProfiles@2023-11-01-preview"
   name                      = var.opc_sim_endpoint_name
   location                  = var.location
-  parent_id                 = data.azurerm_resource_group.this.id
+  parent_id                 = module.resource_group.resource_group_id
 
   depends_on = [azapi_resource.aio_targets_opc_plc_sim]
 
@@ -36,7 +36,7 @@ resource "azapi_resource" "opc_sim_asset" {
   type                      = "Microsoft.DeviceRegistry/assets@2023-11-01-preview"
   name                      = var.opc_sim_asset_name
   location                  = var.location
-  parent_id                 = data.azurerm_resource_group.this.id
+  parent_id                 = module.resource_group.resource_group_id
 
   body = jsonencode({
     extendedLocation = {

@@ -1,0 +1,34 @@
+apiVersion: mq.iotoperations.azure.com/v1beta1
+kind: KafkaConnector
+metadata:
+  name: ${aio_eh_kafka_connector_name}
+  namespace: ${aio_cluster_namespace} # same as one used for other MQ resources
+spec:
+  image:
+    pullPolicy: IfNotPresent
+    repository: mcr.microsoft.com/azureiotoperations/kafka
+    tag: 0.1.0-preview
+  instances: 1
+  clientIdPrefix: my-prefix
+  kafkaConnection:
+    # Port 9093 is Event Hubs' Kakfa endpoint
+    # Plug in your Event Hubs namespace name
+    endpoint: '${event_hub_namespace}.servicebus.windows.net:9093'
+    tls:
+      tlsEnabled: true
+    authentication:
+      enabled: true
+      authType:
+        # sasl:
+        #   saslType: plain
+        #   secretName: my-eh-secret
+        systemAssignedManagedIdentity:
+          # plugin in your Event Hubs namespace name
+          audience: 'https://${event_hub_namespace}.servicebus.windows.net' 
+  localBrokerConnection:
+    endpoint: "aio-mq-dmqtt-frontend:8883"
+    tls:
+      tlsEnabled: true
+      trustedCaCertificateConfigMap: ${aio_trust_config_map_name}
+    authentication:
+      kubernetes: {}

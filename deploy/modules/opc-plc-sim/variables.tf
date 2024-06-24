@@ -10,13 +10,7 @@ variable "name" {
 
 variable "location" {
   type    = string
-  default = "westus3"
-}
-
-variable "resource_group_name" {
-  description = "(Optional) The resource group name where the Azure Arc Cluster resource is located. (Otherwise, 'rg-<var.name>')"
-  type        = string
-  default     = null
+  default = "eastus2"
 }
 
 variable "arc_cluster_name" {
@@ -49,12 +43,6 @@ variable "should_install_opc_plc_simulator" {
   default     = true
 }
 
-variable "should_install_insecure_mqtt_client_for_mqttui" {
-  description = "Sets up a Deployment that contains mqttui for the purpose of debugging MQTT messages in the cluster."
-  type        = bool
-  default     = true
-}
-
 variable "opc_plc_sim_server_name" {
   description = "The name of the OPC PLC Simulator Service and Pod."
   type        = string
@@ -65,12 +53,6 @@ variable "opc_plc_sim_image_version" {
   description = "The version of the OPC PLC Simulator image."
   type        = string
   default     = "2.9.10"
-}
-
-variable "aio_mq_auth_sat_audience" {
-  description = "The AIO MQ broker Service Account Token audience for authentication."
-  type        = string
-  default     = "aio-mq"
 }
 
 variable "aio_trust_config_map_name" {

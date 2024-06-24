@@ -14,4 +14,8 @@ spec:
           objectName: placeholder-secret
           objectType: secret
           objectVersion: ""
+        - |
+          objectName: sp-aio-secret
+          objectType: secret
+          objectVersion: ""
     tenantId: ${aio_tenant_id}

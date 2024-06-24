@@ -10,29 +10,84 @@ variable "name" {
 
 variable "location" {
   type    = string
-  default = "westus3"
+  default = "eastus2"
 }
 
-variable "vm_computer_name" {
-  description = "The Computer Name for the VM."
-  type        = string
-  nullable    = false
+variable "should_create_aio_onboard_sp" {
+  description = "Creates a new Service Principal with 'Kubernetes Cluster - Azure Arc Onboarding' and 'Kubernetes Extension Contributor' roles for onboarding the new cluster to Arc."
+  type        = bool
+  default     = true
 }
 
-variable "vm_username" {
-  description = "The Username used to login to the VM."
-  type        = string
-  nullable    = false
-  validation {
-    condition     = can(regex("^[a-z0-9][a-z0-9-]{1,60}[a-z0-9]$", var.vm_username))
-    error_message = "Please update 'vm_username' which only has lowercase letters, numbers, '-' hyphens."
-  }
+variable "should_create_aio_sp" {
+  description = "Creates a new Service Principal with 'Get' and 'List' permissions on Azure Key Vault for AIO to use in the cluster."
+  type        = bool
+  default     = true
 }
 
-variable "vm_ssh_pub_key_file" {
-  description = "(Required for Linux VMs) The file path to the SSH public key."
+variable "aio_sp_onboard_client_id" {
+  description = "(Optional) The Service Principal Client ID for onboarding the cluster to Arc. (Otherwise, creates new one)"
   type        = string
   default     = null
+  nullable    = true
+}
+
+variable "aio_sp_onboard_client_secret" {
+  description = "(Optional) The Service Principal Client Secret for onboarding the cluster to Arc. (Otherwise, creates new one)"
+  type        = string
+  default     = null
+  sensitive   = true
+  nullable    = true
+}
+
+variable "aio_sp_client_id" {
+  description = "(Optional) The Service Principal Client ID for AIO to use with Azure Key Vault. (Otherwise, creates new one)"
+  type        = string
+  default     = null
+  nullable    = true
+}
+
+variable "aio_sp_client_secret" {
+  description = "(Optional) The Service Principal Client Secret for AIO to use with Azure Key Vault. (Otherwise, creates new one)"
+  type        = string
+  default     = null
+  sensitive   = true
+  nullable    = true
+}
+
+variable "should_create_virtual_machine" {
+  description = "(Optional) Create a virtual machine"
+  type        = bool
+  default     = false
+}
+
+variable "is_linux_server" {
+  description = "The OS of the server."
+  type        = bool
+}
+
+variable "should_create_storage_account" {
+  description = "Creates a new Storage Account"
+  type        = bool
+  default     = false
+}
+
+variable "should_create_container_registry" {
+  description = "Creates a new Container Registry"
+  type        = bool
+  default     = false
+}
+
+variable "should_use_event_hub" {
+  description = "(Optional) Use Event Hub for AIO to send data to cloud"
+  type        = bool
+  default     = false
+}
+
+variable "should_use_event_grid" {
+  description = "(Optional) Use Event Grid for AIO to send data to cloud"
+  type        = bool
+  default     = false
 }
 
 variable "vm_size" {
@@ -91,4 +146,17 @@ variable "kubernetes_distro" {
     condition     = contains(["k3s", "k8s", "microk8s"], var.kubernetes_distro)
     error_message = "Currently only supports [k3s, k8s, microk8s] Kubernetes distros."
   }
+}
+
+variable "aio_mq_broker_auth_non_tls_enabled" {
+  description = "(Optional) Enable non-TLS authentication for the MQTT broker."
+  type        = bool
+  default     = false
+}
+
+variable "should_deploy_mqtt_client" {
+  description = "(Optional) Deploy the MQTT client to the Kubernetes cluster."
+  type        = bool
+  default     = false
+  
 }
