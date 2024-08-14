@@ -2,6 +2,10 @@
 
 Infrastructure as Code (IaC) Terraform to install all Azure IoT Operations (AIO) components. Provides an optional infrastructure deployment that configures a Kubernetes cluster connected to Azure Arc. Includes Terraform module for deploying each part; Infra, Azure IoT Operations, and/or OPC PLC Simulator easy and reusable.
 
+> [!WARNING]  
+> This Azure Edge Extensions has confirmed compatiblity with the 0.5.0 preview version of Azure IoT Operations. Please review
+> [AIO release notes](https://github.com/Azure/azure-iot-operations/releases) for current preview version releases.
+
 ## Features
 
 This project utilizes Terraform to do the following:
