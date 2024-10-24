@@ -145,7 +145,7 @@ An example of deploying just `aio-full` using Terraform from another repo would 
 module "aio_full" {
   source = "github.com/azure-samples/azure-edge-extensions-aio-iac-terraform//deploy/modules/aio-full"
 
-  name     = var.name
+  name     = var.computer_name
   location = var.location
 }
 ```
@@ -156,7 +156,7 @@ If you would like to lock the module on a particular tag that's possible by addi
 module "aio_full_with_tag" {
   source = "github.com/azure-samples/azure-edge-extensions-aio-iac-terraform//deploy/modules/aio-full?ref=0.1.4"
 
-  name     = var.name
+  name     = var.computer_name
   location = var.location
 }
 ```
