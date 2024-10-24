@@ -24,6 +24,8 @@ resource "azurerm_linux_virtual_machine" "this" {
     sku       = "22_04-lts-gen2"
     version   = "latest"
   }
+
+  depends_on = [azurerm_key_vault_secret.admin_password]
 }
 
 resource "azurerm_virtual_machine_extension" "linux_setup" {

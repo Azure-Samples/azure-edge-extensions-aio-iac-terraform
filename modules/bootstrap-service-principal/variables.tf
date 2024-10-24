@@ -16,17 +16,6 @@ variable "onboard_sp_creation_enabled" {
   default     = true
 }
 
-variable "aio_sp_creation_enabled" {
-  type        = bool
-  description = <<-DESCRIPTION
-  Whether or not to create a new Service Principals with: 
-  - 'Get' and 'List' permissions on Azure Key Vault
-
-  Needed by AIO to access AKV.
-  DESCRIPTION
-  default     = true
-}
-
 variable "owners_admin_object_ids" {
   type        = list(string)
   description = "The owners of the new Service Principals otherwise `data.azurerm_client_config.current.object_id` used."
