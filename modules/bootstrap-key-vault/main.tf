@@ -1,6 +1,6 @@
 locals {
   key_vault_name = coalesce(var.name, "kv-${var.postfix}")
-  tenant_id      = try(azurerm_key_vault.this[0].tenant_id, data.azurerm_client_config.current.tenant_id)
+  tenant_id      = try(azurerm_key_vault.this.tenant_id, data.azurerm_client_config.current.tenant_id)
 }
 
 data "azurerm_client_config" "current" {

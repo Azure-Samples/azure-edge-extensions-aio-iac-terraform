@@ -7,7 +7,8 @@ data "azuread_service_principal" "custom_locations_rp" {
 }
 
 data "azurerm_resource_group" "this" {
-  name = local.resource_group_name
+  count = var.resource_group_creation_enabled ? 0 : 1
+  name  = local.resource_group_name
 }
 
 resource "azurerm_resource_group" "this" {

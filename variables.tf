@@ -10,25 +10,6 @@ variable "bootstrap_admin_object_id" {
   default     = null
 }
 
-variable "bootstrap_aio_sp_object_id" {
-  type        = string
-  description = "The service principal object id for aio in cluster."
-  default     = null
-}
-
-variable "bootstrap_aio_sp_client_id" {
-  type        = string
-  description = "The service principal client id for aio in cluster."
-  default     = null
-}
-
-variable "bootstrap_aio_sp_application_password" {
-  type        = string
-  description = "The service principal secret for aio in cluster."
-  default     = null
-  sensitive   = true
-}
-
 variable "bootstrap_arc_resource_name" {
   type        = string
   description = "The name for the new arc cluster resource otherwise `arc-{var.postfix}`"
@@ -55,7 +36,7 @@ variable "bootstrap_onboard_sp_application_password" {
 }
 
 variable "bootstrap_output_server_setup_script_enabled" {
-  type        = string
+  type        = bool
   description = "Whether to output the server setup script that will need to be ran on the server that will have AIO."
   default     = true
 }
@@ -69,7 +50,6 @@ variable "bootstrap_output_server_setup_script_path" {
 variable "location" {
   type        = string
   description = "The location where to deploy the new resources."
-  default     = "eastus2"
 }
 
 variable "postfix" {
@@ -77,7 +57,7 @@ variable "postfix" {
   type        = string
   nullable    = false
   validation {
-    condition     = length(var.postfix) < 15 && can(regex("^[a-z0-9][a-z0-9-]{1,60}[a-z0-9]$", var.postfix))
+    condition     = length(var.postfix) < 16 && can(regex("^[a-z0-9][a-z0-9-]{1,60}[a-z0-9]$", var.postfix))
     error_message = "Please update 'postfix' to a short, unique name, that only has lowercase letters, numbers, '-' hyphens."
   }
 }

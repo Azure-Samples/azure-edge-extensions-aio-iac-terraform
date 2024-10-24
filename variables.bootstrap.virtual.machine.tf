@@ -23,10 +23,11 @@ variable "bootstrap_virtual_machine_admin_username" {
 variable "bootstrap_virtual_machine_computer_name" {
   type        = string
   description = "The name of the virtual machine resource otherwise `vm-{var.postfix}`."
+  default     = null
 }
 
 variable "bootstrap_virtual_machine_creation_enabled" {
-  type        = string
+  type        = bool
   description = "Whether to create the virtual machine and associated resource."
   default     = false
 }

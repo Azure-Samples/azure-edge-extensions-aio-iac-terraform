@@ -28,18 +28,20 @@ variable "onboard_sp_object_id" {
 }
 
 variable "postfix" {
-  description = "The unique primary name used when naming resources. (ex. 'test' makes 'rg-test' resource group)"
   type        = string
-  nullable    = false
-  validation {
-    condition     = length(var.postfix) < 15 && can(regex("^[a-z0-9][a-z0-9-]{1,60}[a-z0-9]$", var.postfix))
-    error_message = "Please update 'postfix' to a short, unique name, that only has lowercase letters, numbers, '-' hyphens."
-  }
+  description = "The unique primary name used when naming resources. (ex. 'test' makes 'rg-test' resource group)"
+  default     = null
 }
 
 variable "resource_group_name" {
   type        = string
-  description = "The name of the resource group for the new resources otherwise `rg-{var.postfix}."
+  description = "The name of the resource group for the new resources."
+  default     = null
+}
+
+variable "resource_group_id" {
+  type        = string
+  description = "The resource id of the resource group for the new resources."
   default     = null
 }
 

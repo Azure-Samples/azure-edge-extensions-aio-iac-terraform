@@ -1,7 +1,7 @@
 module "bootstrap_virtual_machine" {
   count = alltrue([var.bootstrap_enabled, var.bootstrap_virtual_machine_creation_enabled]) ? 1 : 0
 
-  source                          = "modules/bootstrap-virtual-machine"
+  source                          = "./modules/bootstrap-virtual-machine"
   admin_password                  = var.bootstrap_virtual_machine_admin_password
   admin_password_creation_enabled = var.bootstrap_virtual_machine_admin_password_creation_enabled
   admin_username                  = var.bootstrap_virtual_machine_admin_username
@@ -10,7 +10,7 @@ module "bootstrap_virtual_machine" {
   location                        = var.location
   network_creation_enabled        = var.bootstrap_virtual_machine_network_creation_enabled
   postfix                         = var.postfix
-  resource_group_name             = local.resource_group_name
+  resource_group_name             = try(data.azurerm_resource_group.this[0].name, azurerm_resource_group.this[0].name)
   setup_script                    = local.linux_server_setup
   setup_script_enabled            = var.bootstrap_virtual_machine_setup_script_enabled
   size                            = var.bootstrap_virtual_machine_size
